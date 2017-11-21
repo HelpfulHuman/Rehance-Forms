@@ -10,7 +10,7 @@ export interface ComponentFactory<Fields, Props, ChildProps> {
   (Component: React.ComponentClass<ChildProps>|React.StatelessComponent<ChildProps>): React.ComponentClass<Props>;
 }
 
-export interface EnhancedComponent<Fields, Props> extends React.ComponentClass<Props> {
+export interface EnhancedComponent<Fields, Props> extends React.PureComponent<Props> {
   methods: object;
 }
 
