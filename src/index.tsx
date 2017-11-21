@@ -28,10 +28,6 @@ export function createForm<Fields = any, Props = any, ChildProps = any>(opts: Fo
 
       methods: object = {};
 
-      props: Props;
-
-      setState: {(val: any): void};
-
       constructor(props, context) {
         super(props, context);
         this.handleSubmit = this.handleSubmit.bind(this);
