@@ -10,7 +10,7 @@ export interface ComponentFactory<Fields, Props, ChildProps> {
   (Component: React.ComponentClass<ChildProps>|React.StatelessComponent<ChildProps>): React.ComponentClass<Props>;
 }
 
-export interface EnhancedComponent<Fields, Props> extends React.PureComponent<Props> {
+export interface EnhancedComponent<Fields, Props> extends React.ComponentClass<Props> {
   methods: object;
 }
 
@@ -27,6 +27,10 @@ export function createForm<Fields = any, Props = any, ChildProps = any>(opts: Fo
       fieldNames: string[] = [];
 
       methods: object = {};
+
+      props: Props;
+
+      setState: {(val: any): void};
 
       constructor(props, context) {
         super(props, context);
