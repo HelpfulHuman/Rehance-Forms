@@ -10,7 +10,9 @@ Install via `npm`:
 npm i -S rehance-forms
 ```
 
-## `createForm`
+## Methods
+
+### `createForm`
 
 The `createForm` method allows you to configure the fields of your form, how to handle submit, etc...  Each defined field will have methods generated automatically on construction that are then passed down via props to the nested component.
 
