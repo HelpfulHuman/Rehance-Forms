@@ -4,6 +4,7 @@
   "description": "Form utilities and higher-order components for React",
   "main": "dist/index.js",
   "jsnext:main": "dist/index.es.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "preversion": "npm test",
     "version": "npm run build",
