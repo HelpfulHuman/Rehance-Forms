@@ -15,7 +15,7 @@ function validatePassword(password) {
   }
 }
 
-function renderError(error: string, i: number): JSX.Element {
+function renderError(error, i) {
   return (
     <li key={i}>{error}</li>
   );
@@ -62,4 +62,3 @@ render(
   <Form />
   , document.getElementById("root")
 );
-
