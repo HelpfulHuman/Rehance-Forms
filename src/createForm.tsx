@@ -42,7 +42,7 @@ function capitalize(str: string): string {
 }
 
 function _format(val: any): any {
-  return val;
+  return (val || "");
 }
 
 function _validate(): void {}
@@ -84,31 +84,81 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
         const format = (isFunc(field.format) ? field.format : _format);
         const validate = (isFunc(field.validate) ? field.validate : _validate);
 
-        // Create a method that will generate a new field state based on a new value
-        const getUpdatedState = (value: any, dirty: boolean) => {
-          // Format and validate the value
+        // Wrap our validation in a catch-all function
+        const safeValidate = (value: any): Promise<void> => {
+          // Validate the value
           var error = null;
           try {
-            value = format(value);
-            error = validate(value);
+            return Promise.resolve(validate(value));
           } catch (err) {
-            error = err.message;
+            return Promise.reject(err);
           }
-
-          // Return the new state for the field
-          return { value, error, dirty };
         };
+
+        // Helper function for determining if field is dirty
+        const isDirty = (value) => (!initialValue || value != initialValue);
+
+        // Get the default value for the form
+        const initialValue = format(field.default);
 
         // Bind a set method handler for this field
         const set = this.methods[`set${Name}`] = (value) => {
-          // Update the component's field state
-          this.setState({ [name]: getUpdatedState(value, true) });
+          var error = null;
+          var cachedValue = value;
+
+          try {
+            // Format the current value for the field
+            value = format(value);
+          } catch (err) {
+            console.error("A field format() method threw an error", err);
+            value = cachedValue;
+            error = err.message;
+          }
+
+          this.setState({
+            [name]: { value, error, dirty: isDirty(value) }
+          });
+        };
+
+        // Bind the onFocus handler for this field
+        this.methods[`on${Name}Focus`] = () => {
+          // Get the current state of the field
+          var state = this.state[name];
+
+          this.setState({
+            [name]: { ...state, error: null }
+          });
+        };
+
+        // Bind the onBlur handler for this field
+        this.methods[`on${Name}Blur`] = () => {
+          // Get the current state of the field
+          var state = this.state[name];
+
+          // Validate the error
+          safeValidate(state.value).then(() => {
+            this.setState({
+              [name]: {
+                value: state.value,
+                error: null,
+                dirty: isDirty(state.value),
+              }
+            });
+          }).catch(err => {
+            this.setState({
+              [name]:  {
+                value: state.value,
+                error: (err.message || err),
+                dirty: isDirty(state.value),
+              },
+            });
+          });
         };
 
         // Bind the onChange handler for this field
         this.methods[`on${Name}Change`] = (value) => {
           // If value is an event, get the value of the DOM element
-          if (value.currentTarget && value.currentTarget.value) {
+          if (value.currentTarget && (typeof value.currentTarget.value === "string")) {
             value = value.currentTarget.value;
           }
 
@@ -116,8 +166,11 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
         };
 
         // Set the default state for the field
-        this.state[name] = getUpdatedState(field.default, false);
-
+        this.state[name] = {
+          error: validate(initialValue),
+          value: initialValue,
+          dirty: false,
+        };
       }
 
       componentWillReceiveProps(nextProps: Props) {
@@ -134,11 +187,15 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
 
       getChildProps(): ChildProps {
         var errors = [];
+        var showErrors = false;
         var isValid = true;
         for (var key in this.state) {
           if (this.state[key].error) {
             isValid = false;
-            errors.push(this.state[key].error);
+            if (this.state[key].dirty) {
+              errors.push(this.state[key].error);
+              showErrors = true;
+            }
           }
         }
 
@@ -146,7 +203,7 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
           ...this.props as any,
           [ns]: {
             onSubmit: this.handleSubmit,
-            errors: errors,
+            errors: (showErrors ? errors : []),
             isValid: isValid,
             ...this.state,
             ...this.methods,
