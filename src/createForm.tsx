@@ -85,16 +85,14 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
         const validate = (isFunc(field.validate) ? field.validate : _validate);
 
         // Wrap our validation in a catch-all function
-        const safeValidate = (value: any): string => {
+        const safeValidate = (value: any): Promise<void> => {
           // Validate the value
           var error = null;
           try {
-            error = validate(value);
+            return Promise.resolve(validate(value));
           } catch (err) {
-            error = err.message;
+            return Promise.reject(err);
           }
-
-          return error;
         };
 
         // Helper function for determining if field is dirty
@@ -138,10 +136,22 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
           var state = this.state[name];
 
           // Validate the error
-          var error = safeValidate(state.value);
-
-          this.setState({
-            [name]: { ...state, error, dirty: isDirty(state.value) }
+          safeValidate(state.value).then(() => {
+            this.setState({
+              [name]: {
+                value: state.value,
+                error: null,
+                dirty: isDirty(state.value),
+              }
+            });
+          }).catch(err => {
+            this.setState({
+              [name]:  {
+                value: state.value,
+                error: (err.message || err),
+                dirty: isDirty(state.value),
+              },
+            });
           });
         };
 
