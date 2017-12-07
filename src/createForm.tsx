@@ -33,6 +33,9 @@ export type FieldProps<Fields> = FieldMethods<Fields> & {
 export type FormChildProps<Fields> = {
   isValid: boolean;
   onSubmit(): void;
+  resetForm(): void;
+  setValues(values: Fields): void;
+  setErrors(errors: FieldErrors<Fields>): void;
 };
 
 export type FormProps<Fields> =
@@ -40,7 +43,7 @@ export type FormProps<Fields> =
   & FieldProps<Fields>;
 
 export type ChildProps<Fields, Props> = Props & {
-  [namespace: string]: FormProps<Fields>;
+  form: FormProps<Fields>; // TODO: Make "form" match a given namespace string
 };
 
 export interface FormState<Fields> {
@@ -124,6 +127,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
       constructor(props, context) {
         super(props, context);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleReset = this.handleReset.bind(this);
 
         // Get the values for the form fields
         var fields = getFields(props);
@@ -230,6 +234,17 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
       }
 
       /**
+       * Reset the form to its initial values and empty out the dirty states.
+       */
+      handleReset() {
+        this.setState({
+          values: this.initialValues,
+          errors: {} as any,
+          dirty: {} as any,
+        });
+      }
+
+      /**
        * Set a field value explicitly outside of an onChange event and perform immediate
        * validation as a blur-call is not expected after this call.
        */
@@ -292,6 +307,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
           [ns]: {
             ...fields as any,
             onSubmit: this.handleSubmit,
+            onReset: this.handleReset,
             isValid: (formHasChanges && !formHasErrors),
           }
         };
