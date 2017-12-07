@@ -1,6 +1,6 @@
 # Rehance-Forms
 
-This library offers utilities for creating forms in React using stateless components.
+This library aims to ease the pain of creating forms and other state-oriented components in React.  It offers support for handling validation states, form interaction state and automatically binds methods (outside of the `render()`).
 
 ## Getting Started
 
