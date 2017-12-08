@@ -12,7 +12,7 @@ npm i -S rehance-forms
 
 ## Methods
 
-### `createForm`
+### `createForm` (WIP)
 
 The `createForm` method allows you to configure the fields of your form, how to handle submit, etc...  Each defined field will have methods generated automatically on construction that are then passed down via props to the nested component.
 
@@ -25,11 +25,9 @@ import * as React from "react";
 import {createForm} from "rehance-forms";
 
 const NumericInput = createForm({
-  mapPropsToState(props) {
-    return {
-      myNumber: (props.initialNumber || 0),
-    };
-  },
+  fields: (props) => ({
+    myNumber: (props.initialNumber || 0),
+  }),
   validate(fields, props) {
     var errors = {};
     if (fields.myNumber < 0 || fields.myNumber > 20) {
@@ -42,17 +40,11 @@ const NumericInput = createForm({
   },
 })(function (props) {
   var form = props.form;
-  var errors = null;
-
-  if (form.hasErrors) {
-    errors = Object.keys(form.errors).map(key => <li>{form.errors[key]}</li>);
-    errors = (<ul>{errors}</ul>);
-  }
 
   return (
     <div>
-      {errors}
       <input type="numeric" {...form.myNumber} />
+      <div>{form.myNumber.error}</div>
       <button disabled={!form.isValid} onClick={form.onSubmit}>Log In</button>
     </div>
   );
