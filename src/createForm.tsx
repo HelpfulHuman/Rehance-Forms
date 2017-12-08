@@ -35,7 +35,8 @@ export type FormChildProps<Fields> = {
   isClean: boolean;
   hasErrors: boolean;
   onSubmit(): void;
-  resetForm(): void;
+  reset(): void;
+  resetWith(fields: Fields): void;
   setValues(values: Fields): void;
   setErrors(errors: FieldErrors<Fields>): void;
 };
@@ -72,7 +73,7 @@ export interface FormOptions<Fields, Props> {
   fields: Fields|{(props: Props): Fields};
   validate?: Validator<Fields, Props>;
   onSubmit?(fields: Fields, props: Props): void;
-  shouldResetValues?(nextProps: Props): boolean;
+  shouldResetValues?(nextProps: Props, prevProps: Props): boolean;
 }
 
 export interface ComponentFactory<Props, ChildProps> {
@@ -118,6 +119,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
         this.handleReset = this.handleReset.bind(this);
         this.validateAndSetValues = this.validateAndSetValues.bind(this);
         this.setErrorsManually = this.setErrorsManually.bind(this);
+        this.resetWith = this.resetWith.bind(this);
 
         // Get the values for the form fields
         var fields = getFields(props);
@@ -150,11 +152,19 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
       /**
        * Reset the form values when new props come in.
        */
-      // componentWillReceiveProps(nextProps: Props): void {
-      //   if (isFunc(opts.shouldResetValues) && opts.shouldResetValues(nextProps)) {
-      //     // TODO: Implement reset logic
-      //   }
-      // }
+      componentWillReceiveProps(nextProps: Props): void {
+        if (isFunc(opts.shouldResetValues) && opts.shouldResetValues(nextProps, this.props)) {
+          this.resetWith(getFields(nextProps) as any);
+        }
+      }
+
+      /**
+       * Reset with specific values regardless of known fields.
+       */
+      resetWith(fields: Fields) {
+        this.initialValues = fields;
+        this.handleReset();
+      }
 
       /**
        * Run validation on the whole form.
@@ -337,7 +347,8 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
           [ns]: {
             ...fields as any,
             onSubmit: this.handleSubmit,
-            onReset: this.handleReset,
+            reset: this.handleReset,
+            resetWith: this.resetWith,
             // setValues: this.validateAndSetValues,
             // setErrors: this.setErrorsManually,
             isClean: !hasChanges,
