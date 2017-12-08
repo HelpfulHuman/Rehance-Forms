@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "react": "^16.1.1",
-    "react-dom": "^16.1.1"
+    "react-dom": "^16.1.1",
+    "yup": "^0.23.0"
   }
 }
