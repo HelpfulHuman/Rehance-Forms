@@ -1,17 +1,18 @@
 import * as React from "react";
 import {render} from "react-dom";
 import {createForm} from "../../dist";
+import * as yup from "yup";
 
 function validateEmail(email) {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (!email || !re.test(email)) {
-    throw "You must provide a valid email address.";
+    return "You must provide a valid email address.";
   }
 }
 
-function validatePassword(password) {
-  if (!password || password.length < 8 || password.length > 20) {
-    throw "You must provide a password that is between 8 and 20 characters long.";
+function validatePassword(password, min, max) {
+  if (!password || password.length < min || password.length > max) {
+    return `You must provide a password that is between ${min} and ${max} characters long.`;
   }
 }
 
@@ -22,39 +23,56 @@ function renderError(error, i) {
 }
 
 function FormLayout({ form }) {
-  var errors = null;
+  var errorMessage = null;
 
-  if (form.errors.length > 0) {
-    errors = (
-      <ul>
-        {form.errors.map(renderError)}
-      </ul>
-    );
+  if (form.hasErrors) {
+    errorMessage = (<div>1 or more errors has occurred.</div>);
   }
 
   return (
     <div>
-      {errors}
-      <input type="email" onBlur={form.onEmailBlur} onChange={form.onEmailChange} value={form.email.value} />
-      <input type="password" onBlur={form.onPasswordBlur} onChange={form.onPasswordChange} value={form.password.value} />
+      {errorMessage}
+      <div>
+        <input type="email" {...form.email} />
+        <span>{form.email.error}</span>
+      </div>
+      <div>
+        <input type="password" {...form.password} />
+        <span>{form.password.error}</span>
+      </div>
       <button disabled={!form.isValid} onClick={form.onSubmit}>Submit</button>
     </div>
   );
 }
 
+const schema = yup.object().shape({
+  email: yup.string().email().required(),
+  password: yup.string().required(),
+});
+
+function withYup(schema) {
+  return function (fields) {
+    schema.validate(fields, { abortEarly: false })
+      .catch(function (yupError) {
+        var errors = {};
+        for (var err of yupError.inner) {
+          if (!errors[err.path]) {
+            errors[err.path] = err.message;
+          }
+        }
+        return Promise.reject(errors);
+      });
+  };
+}
+
 const Form = createForm({
   fields: {
-    email: {
-      default: "",
-      validate: validateEmail,
-    },
-    password: {
-      default: "",
-      validate: validatePassword,
-    },
+    email: "",
+    password: "",
   },
-  onSubmit({ form }) {
-    console.log(form);
+  validate: withYup(schema),
+  onSubmit(fields) {
+    console.log(fields);
   },
 })(FormLayout);
 

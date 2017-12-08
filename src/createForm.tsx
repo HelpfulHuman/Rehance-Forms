@@ -32,6 +32,8 @@ export type FieldProps<Fields> = FieldMethods<Fields> & {
 
 export type FormChildProps<Fields> = {
   isValid: boolean;
+  isClean: boolean;
+  hasErrors: boolean;
   onSubmit(): void;
   resetForm(): void;
   setValues(values: Fields): void;
@@ -44,11 +46,14 @@ export type FormProps<Fields> =
 
 export type ChildProps<Fields, Props> = Props & {
   form: FormProps<Fields>; // TODO: Make "form" match a given namespace string
+  [namespace: string]: FormProps<Fields>;
 };
 
 export interface FormState<Fields> {
   allowSubmit: boolean;
-  focused: string;
+  focused: keyof Fields;
+  hasChanges: boolean;
+  hasErrors: boolean;
   values: Fields;
   errors: FieldErrors<Fields>;
   dirty: FieldState<Fields>;
@@ -81,7 +86,7 @@ export interface ComponentFactory<Props, ChildProps> {
 function createValidator<Fields, Props>(validate: Validator<Fields, Props>): AsyncValidator<Fields, Props> {
   // If they didn't provide a validation method, then we don't care
   if (!validate) {
-    return () => null;
+    return () => Promise.resolve(null);
   }
 
   return function (form, props) {
@@ -110,14 +115,14 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
       state: FormState<Fields> = {
         allowSubmit: false,
         focused: null,
+        hasChanges: false,
+        hasErrors: false,
         values: {} as any,
         errors: {} as any,
         dirty: {} as any,
       };
 
       private methods: FieldMethods<Fields> = {} as any;
-
-      private fieldNames: string[] = [];
 
       private initialValues: Fields = {} as any;
 
@@ -126,8 +131,12 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
        */
       constructor(props, context) {
         super(props, context);
+
+        // Hard-bind methods
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.validateAndSetValues = this.validateAndSetValues.bind(this);
+        this.setErrorsManually = this.setErrorsManually.bind(this);
 
         // Get the values for the form fields
         var fields = getFields(props);
@@ -142,9 +151,6 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
        * Create methods for managing a field.
        */
       setupField(name: string, value: any): void {
-        // Store the field name for later
-        this.fieldNames.push(name);
-
         // Set the given value as the initial value for comparing dirty states
         this.initialValues[name] = value;
 
@@ -154,34 +160,63 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
 
         // Bind a set method handler for this field
         this.methods[name] = {
-          set: (value) => this.validateAndSetField(name, value),
           onFocus: (event) => this.handleFocus(event, name),
           onBlur: (event) => this.handleBlur(event, name),
           onChange: (event) => this.handleChange(event, name),
         };
       }
 
-      componentWillReceiveProps(nextProps: Props): void {
-        if (isFunc(opts.shouldResetValues) && opts.shouldResetValues(nextProps)) {
-          // TODO: Implement reset logic
-        }
-      }
+      /**
+       * Reset the form values when new props come in.
+       */
+      // componentWillReceiveProps(nextProps: Props): void {
+      //   if (isFunc(opts.shouldResetValues) && opts.shouldResetValues(nextProps)) {
+      //     // TODO: Implement reset logic
+      //   }
+      // }
 
       /**
        * Run validation on the whole form.
        */
-      private validateForm(): void {
+      private async validateForm(): Promise<any> {
         // Disallow submit until AFTER validation
         this.setState({ allowSubmit: false });
 
         // Validate the entire form's contents
-        validate(this.state.values, this.props)
+        try {
+          validate(this.state.values, this.props)
           .then(() => {
-            this.setState({ allowSubmit: true });
+            this.setState({
+              allowSubmit: true,
+              hasErrors: false,
+              hasChanges: true,
+              errors: {} as any,
+            });
           })
-          .catch((errors) => {
-            this.setState({ errors });
+          .catch((errors = {}) => {
+            // Comb through errors and only display errors for dirty fields
+            var hasErrors = false;
+            for (var k in this.state.values) {
+              if (this.state.dirty[k] && errors[k]) {
+                hasErrors = true;
+              } else {
+                delete errors[k];
+              }
+            }
+
+            // Update the state with the new errors
+            this.setState({
+              allowSubmit: false,
+              hasErrors: hasErrors,
+              hasChanges: hasErrors,
+              errors: (errors || {}),
+            });
           });
+        } catch (err) {
+
+          console.warn("An error occurred in your form validation that does not conform to the validation format.", err);
+
+        }
       }
 
       /**
@@ -193,7 +228,13 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
         if (!name) name = (ev.currentTarget.name || null);
 
         // Set the focused state for this field
-        this.setState({ focused: name });
+        this.setState((state) => ({
+          focused: name as any,
+          dirty: {
+            ...state.dirty as any,
+            [name]: !this.initialValues[name],
+          }
+        }));
       }
 
       /**
@@ -201,10 +242,8 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
        * field that was previously bound.
        */
       handleBlur(ev: React.SyntheticEvent<any>, name?: string): void {
-        // Attempt to get a name from the SyntheticEvent if one is not given explicitly
-        if (!name) name = ev.currentTarget.name;
-
-        // Set the current state to
+        this.setState({ focused: null });
+        this.validateForm();
       }
 
       /**
@@ -222,15 +261,24 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
         }
 
         // Attempt to get the value from the SyntheticEvent (if that's what it is)
-        var value = (ev.currentTarget && ev.currentTarget.value ? ev.currentTarget.value : ev);
+        var value = "";
+        if (typeof ev === "object" && "currentTarget" in ev) {
+          value = (ev.currentTarget.value || "");
+        } else {
+          value = ev;
+        }
+
+        // Determine if the field has actually changed
+        var dirty = (!this.initialValues[name] || this.initialValues[name] != value);
 
         // Disable form submission, set the current field to focused (since it happened in onChange)
         // and update the value for the field (should we drop the error as well?)
-        this.setState({
+        this.setState((state) => ({
           allowSubmit: false,
           focused: name,
-          values: { [name]: value },
-        } as any);
+          dirty: { ...state.dirty as any, [name]: dirty },
+          values: { ...state.values as any, [name]: value },
+        }));
       }
 
       /**
@@ -238,6 +286,9 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
        */
       handleReset() {
         this.setState({
+          allowSubmit: false,
+          hasChanges: false,
+          hasErrors: false,
           values: this.initialValues,
           errors: {} as any,
           dirty: {} as any,
@@ -248,21 +299,22 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
        * Set a field value explicitly outside of an onChange event and perform immediate
        * validation as a blur-call is not expected after this call.
        */
-      validateAndSetField(name: string, value: any): void {
+      validateAndSetValues(values: {[key in keyof Fields]: Fields[key]}): void {
         // Set the value for the field and disallow submit until AFTER validation
         this.setState((state) => ({
           allowSubmit: false,
-          values: { ...state.values, [name]: value }
-        }));
+          values: { ...state.values as any, values },
+        }), this.validateForm);
+      }
 
-        // Validate the entire form's contents
-        validate(this.state.values, this.props)
-        .then(() => {
-          this.setState({ allowSubmit: true });
-        })
-        .catch((errors) => {
-          this.setState({ errors });
-        });
+      /**
+       * Manually set the error messages.
+       */
+      setErrorsManually(errors: FieldErrors<Fields>): void {
+        this.setState({
+          errors: (errors || {}),
+          hasErrors: (!!errors),
+        } as any);
       }
 
       /**
@@ -274,31 +326,23 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
         }
       }
 
+      /**
+       * Generate an object of props that will be passed down to the component children.
+       */
       getChildProps(): ChildProps<Props, Fields> {
-        // Track if there are any dirty fields
-        var formHasChanges = false;
-
-        // Whether or not we've encountered any errors
-        var formHasErrors = false;
+        // Break apart the state values for the component
+        var {values, errors, dirty, allowSubmit, hasChanges, hasErrors} = this.state;
 
         // Create a new object to hold our field props
         var fields: FieldProps<Fields> = {} as any;
 
         // Loop through our field values to construct our field props
-        for (var k in this.state.values) {
-          if (this.state.dirty[k]) {
-            formHasChanges = true;
-          }
-
-          if (this.state.errors[k]) {
-            formHasErrors = true;
-          }
-
-          fields[k as any] = {
+        for (var k in values) {
+          fields[k as string] = {
             ...this.methods[k] as any,
-            value: this.state.values[k],
-            error: this.state.errors[k],
-            dirty: this.state.dirty[k],
+            value: (values[k] || ""),
+            error: (errors[k] || null),
+            dirty: dirty[k].toString(),
           };
         }
 
@@ -308,18 +352,21 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
             ...fields as any,
             onSubmit: this.handleSubmit,
             onReset: this.handleReset,
-            isValid: (formHasChanges && !formHasErrors),
+            // setValues: this.validateAndSetValues,
+            // setErrors: this.setErrorsManually,
+            isClean: !hasChanges,
+            hasErrors: hasErrors,
+            isValid: (allowSubmit && hasChanges && !hasErrors),
           }
         };
       }
 
       render() {
-        var childProps = this.getChildProps();
+        var {children, ...props} = this.getChildProps() as any;
 
         return (
-          <Component
-            {...childProps as any}>
-            {this.props.children}
+          <Component {...props}>
+            {children}
           </Component>
         );
       }
