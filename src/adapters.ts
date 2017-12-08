@@ -11,8 +11,10 @@ export interface Yuppish<Fields> {
  */
 export function withYup<Fields = any>(schema: Yuppish<Fields>) {
   return function (fields: Fields) {
-    schema
-      .validate(fields, { abortEarly: false })
+    return schema.validate(fields, { abortEarly: false })
+      .then(function (data) {
+        return data;
+      })
       .catch(function (err) {
         var errors = {};
 

@@ -79,25 +79,6 @@ export interface ComponentFactory<Props, ChildProps> {
   (Component: React.ComponentClass<ChildProps>|React.StatelessComponent<ChildProps>): React.ComponentClass<Props>;
 }
 
-/**
- * Take a validation method and return a safe default with support for promises,
- * if no value is provided, then a fallback method will be provided.
- */
-function createValidator<Fields, Props>(validate: Validator<Fields, Props>): AsyncValidator<Fields, Props> {
-  // If they didn't provide a validation method, then we don't care
-  if (!validate) {
-    return () => Promise.resolve(null);
-  }
-
-  return function (form, props) {
-    try {
-      return Promise.resolve(validate(form, props));
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  };
-}
-
 export function createForm<Fields = object, Props = object>(opts: FormOptions<Fields, Props>): ComponentFactory<Props, ChildProps<Fields, Props>> {
   // Cache options and apply defaults
   const ns = (opts.namespace || "form");
@@ -106,7 +87,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
   const getFields = (typeof opts.fields === "function" ? opts.fields : (props) => opts.fields);
 
   // Create a validator that supports both return values and promises
-  const validate = createValidator<Fields, Props>(opts.validate);
+  const validate = (opts.validate ? opts.validate : () => null);
 
   // Return a factory method for generating new components
   return function (Component) {
@@ -178,14 +159,21 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
       /**
        * Run validation on the whole form.
        */
-      private async validateForm(): Promise<any> {
+      private validateForm(): void {
         // Disallow submit until AFTER validation
         this.setState({ allowSubmit: false });
 
         // Validate the entire form's contents
         try {
-          validate(this.state.values, this.props)
-          .then(() => {
+          var res = validate(this.state.values, this.props) as any;
+
+          if (!isPromise(res) && res) {
+            res = Promise.reject(res);
+          } else if (!isPromise(res)) {
+            return;
+          }
+
+          res.then(() => {
             this.setState({
               allowSubmit: true,
               hasErrors: false,
@@ -197,10 +185,10 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
             // Comb through errors and only display errors for dirty fields
             var hasErrors = false;
             for (var k in this.state.values) {
-              if (this.state.dirty[k] && errors[k]) {
+              if (this.state.dirty[k] && errors[k as string]) {
                 hasErrors = true;
               } else {
-                delete errors[k];
+                delete errors[k as any];
               }
             }
 
@@ -210,12 +198,10 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
               hasErrors: hasErrors,
               hasChanges: hasErrors,
               errors: (errors || {}),
-            });
+            } as any);
           });
         } catch (err) {
-
           console.warn("An error occurred in your form validation that does not conform to the validation format.", err);
-
         }
       }
 
