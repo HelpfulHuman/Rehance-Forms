@@ -1,6 +1,6 @@
 import * as React from "react";
 import {render} from "react-dom";
-import {createForm} from "../../dist";
+import {createForm, withYup} from "../../dist";
 import * as yup from "yup";
 
 function validateEmail(email) {
@@ -49,21 +49,6 @@ const schema = yup.object().shape({
   email: yup.string().email().required(),
   password: yup.string().required(),
 });
-
-function withYup(schema) {
-  return function (fields) {
-    schema.validate(fields, { abortEarly: false })
-      .catch(function (yupError) {
-        var errors = {};
-        for (var err of yupError.inner) {
-          if (!errors[err.path]) {
-            errors[err.path] = err.message;
-          }
-        }
-        return Promise.reject(errors);
-      });
-  };
-}
 
 const Form = createForm({
   fields: {
