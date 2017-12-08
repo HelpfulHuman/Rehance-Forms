@@ -21,15 +21,12 @@ export interface ComponentFactory<Props, ChildProps> {
   (Component: React.ComponentClass<ChildProps>|React.StatelessComponent<ChildProps>): React.ComponentClass<Props>;
 }
 
-export interface EnhancedComponent<Props> extends React.PureComponent<Props> {
-  methods: object;
-}
-
 interface State {
   [name: string]: {
-    value: any,
-    error: string,
-    dirty: boolean,
+    value: any;
+    error: string;
+    dirty: boolean;
+    focused: boolean;
   };
 }
 
@@ -53,11 +50,11 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
 
   // Return a factory method for generating new components
   return function (Component) {
-    return class extends React.Component<Props, State> implements EnhancedComponent<Props> {
+    return class extends React.Component<Props, State> {
 
       state: State = {};
 
-      methods: object = {};
+      private methods: object = {};
 
       constructor(props, context) {
         super(props, context);
@@ -84,64 +81,57 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
         const format = (isFunc(field.format) ? field.format : _format);
         const validate = (isFunc(field.validate) ? field.validate : _validate);
 
-        // Wrap our validation in a catch-all function
-        const safeValidate = (value: any): string => {
-          // Validate the value
-          var error = null;
+        // Wrap our formatter in a catch-all function
+        const safeFormat = (value) => {
+          var cachedValue = value;
           try {
-            error = validate(value);
+            // Format the current value for the field
+            value = format(value);
           } catch (err) {
-            error = err.message;
+            console.error("A field format() function threw an error:", err);
+            value = cachedValue;
           }
-
-          return error;
+          return value;
         };
 
-        // Helper function for determining if field is dirty
-        const isDirty = (value) => (!initialValue || value != initialValue);
+        // Wrap our validation in a catch-all function
+        const safeValidate = (value: any): Promise<string> => {
+          try {
+            return Promise.resolve(validate(value)).catch(err => err.message || err);
+          } catch (err) {
+            return Promise.resolve(err.message || err);
+          }
+        };
+
+        // Helper function for updating the field's state
+        const update = (value: any, error: string, focused: boolean) => this.setState({
+          [name]: { value, error, focused, dirty: (!initialValue || value != initialValue) }
+        });
 
         // Get the default value for the form
         const initialValue = format(field.default);
 
         // Bind a set method handler for this field
-        const set = this.methods[`set${Name}`] = (value) => {
-          var error = null;
-          var cachedValue = value;
+        const setValue = this.methods[`set${Name}`] = (value) => {
+          value = safeFormat(value);
 
-          try {
-            // Format the current value for the field
-            value = format(value);
-          } catch (err) {
-            console.error("A field format() method threw an error", err);
-            value = cachedValue;
-            error = err.message;
-          }
-
-          this.setState({
-            [name]: { value, error, dirty: isDirty(value) }
+          safeValidate(value).then(error => {
+            update(value, error, this.state[name].focused);
           });
         };
 
         // Bind the onFocus handler for this field
         this.methods[`on${Name}Focus`] = () => {
-          // Get the current state of the field
-          var state = this.state[name];
-
-          this.setState({
-            [name]: { ...state, error: null }
-          });
+          update(this.state[name].value, null, true);
         };
 
         // Bind the onBlur handler for this field
         this.methods[`on${Name}Blur`] = () => {
-          // Get the current state of the field
-          var state = this.state[name];
-
+          // Get the current value of the field
+          var value = this.state[name].value;
           // Validate the error
-          var error = safeValidate(state.value);
-
-          this.setState({
-            [name]: { ...state, error, dirty: isDirty(state.value) }
+          safeValidate(value).then(error => {
+            update(value, (error || null), false);
           });
         };
 
@@ -152,14 +142,15 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
             value = value.currentTarget.value;
           }
 
-          set(value);
+          update(safeFormat(value), null, true);
         };
 
         // Set the default state for the field
         this.state[name] = {
-          error: validate(initialValue),
+          error: null,
           value: initialValue,
           dirty: false,
+          focused: false,
         };
       }
 
@@ -180,12 +171,15 @@ export function createForm<Props = any, ChildProps = any>(opts: FormOptions<Prop
         var showErrors = false;
         var isValid = true;
         for (var key in this.state) {
-          if (this.state[key].error) {
+          var field = this.state[key];
+          if (field.error) {
             isValid = false;
-            if (this.state[key].dirty) {
-              errors.push(this.state[key].error);
+            if (field.dirty) {
+              errors.push(field.error);
               showErrors = true;
             }
+          } else if (!field.dirty || field.focused) {
+            isValid = false;
           }
         }
 

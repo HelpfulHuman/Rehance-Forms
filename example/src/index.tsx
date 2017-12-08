@@ -5,17 +5,17 @@ import {createForm} from "../../dist";
 function validateEmail(email) {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   if (!email || !re.test(email)) {
-    return "You must provide a valid email address.";
+    throw "You must provide a valid email address.";
   }
 }
 
 function validatePassword(password) {
   if (!password || password.length < 8 || password.length > 20) {
-    return "You must provide a password that is between 8 and 20 characters long.";
+    throw "You must provide a password that is between 8 and 20 characters long.";
   }
 }
 
-function renderError(error: string, i: number): JSX.Element {
+function renderError(error, i) {
   return (
     <li key={i}>{error}</li>
   );
@@ -62,4 +62,3 @@ render(
   <Form />
   , document.getElementById("root")
 );
-
