@@ -153,7 +153,11 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
        * Reset the form values when new props come in.
        */
       componentWillReceiveProps(nextProps: Props): void {
-        if (isFunc(opts.shouldResetValues) && opts.shouldResetValues(nextProps, this.props)) {
+        if (
+          nextProps &&
+          isFunc(opts.shouldResetValues) &&
+          opts.shouldResetValues(nextProps, this.props)
+        ) {
           this.resetWith(getFields(nextProps) as any);
         }
       }
