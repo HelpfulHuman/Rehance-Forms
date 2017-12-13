@@ -1,6 +1,6 @@
 {
   "name": "rehance-forms",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Form utilities for React",
   "main": "dist/index.js",
   "jsnext:main": "dist/index.es.js",
