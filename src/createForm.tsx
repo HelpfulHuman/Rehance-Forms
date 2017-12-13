@@ -342,7 +342,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
             ...this.methods[k] as any,
             value: (values[k] || ""),
             error: (errors[k] || null),
-            dirty: dirty[k].toString(),
+            dirty: (dirty[k] || false).toString(),
           };
         }
 
