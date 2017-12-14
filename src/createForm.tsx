@@ -303,7 +303,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
         // Set the value for the field and disallow submit until AFTER validation
         this.setState((state) => ({
           allowSubmit: false,
-          values: { ...state.values as any, values },
+          values: { ...state.values as any, ...values as any },
         }), this.validateForm);
       }
 
@@ -353,7 +353,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
             onSubmit: this.handleSubmit,
             reset: this.handleReset,
             resetWith: this.resetWith,
-            // setValues: this.validateAndSetValues,
+            setValues: this.validateAndSetValues,
             // setErrors: this.setErrorsManually,
             isClean: !hasChanges,
             hasErrors: hasErrors,
