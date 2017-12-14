@@ -340,7 +340,7 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
         for (var k in values) {
           fields[k as string] = {
             ...this.methods[k] as any,
-            value: (values[k] || ""),
+            value: values[k],
             error: (errors[k] || null),
             dirty: (dirty[k] || false).toString(),
           };
