@@ -10,15 +10,8 @@ function renderError(error, i) {
 }
 
 function FormLayout({ form }) {
-  var errorMessage = null;
-
-  if (form.hasErrors) {
-    errorMessage = (<div>1 or more errors has occurred.</div>);
-  }
-
   return (
     <div>
-      {errorMessage}
       <div>
         <input type="email" {...form.email} />
         <span>{form.email.error}</span>
@@ -37,18 +30,52 @@ const schema = yup.object().shape({
   password: yup.string().required(),
 });
 
-const Form = createForm({
+// interface FormFields {
+//   email: string;
+//   password: string;
+// }
+
+const Form = createForm<any, any>({
   fields: {
     email: "",
     password: "",
   },
   validate: withYup(schema),
-  onSubmit(fields) {
-    console.log(fields);
+  onSubmit(fields, props) {
+    props.setResult(fields);
   },
 })(FormLayout);
 
+class App extends React.Component {
+  state = { result: null };
+
+  constructor(props, context) {
+    super(props, context);
+    this.setResult = this.setResult.bind(this);
+  }
+
+  setResult(result: any): void {
+    this.setState({ result });
+  }
+
+  render() {
+    var result = this.state.result;
+    var sentMessage;
+
+    if (result !== null) {
+      sentMessage = `Sent: ${JSON.stringify(result)}`;
+    }
+
+    return (
+      <div>
+        {sentMessage}
+        <Form setResult={this.setResult} />
+      </div>
+    );
+  }
+}
+
 render(
-  <Form />
+  <App />
   , document.getElementById("root")
 );
