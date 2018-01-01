@@ -1,6 +1,6 @@
 import * as React from "react";
 import {render} from "react-dom";
-import {createForm, withYup} from "../../dist";
+import {createForm, withYup} from "./stateside";
 import * as yup from "yup";
 
 function renderError(error, i) {
