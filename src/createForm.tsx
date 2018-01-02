@@ -132,6 +132,13 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
       }
 
       /**
+       * Validate the initial form state.
+       */
+      componentWillMount() {
+        this.validateForm();
+      }
+
+      /**
        * Create methods for managing a field.
        */
       setupField(name: string, value: any): void {
