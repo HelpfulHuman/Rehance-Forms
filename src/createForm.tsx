@@ -34,6 +34,7 @@ export type FormChildProps<Fields> = {
   isValid: boolean;
   isClean: boolean;
   hasErrors: boolean;
+  hasChanges: boolean;
   onSubmit(): void;
   reset(): void;
   resetWith(fields: Fields): void;
@@ -68,7 +69,7 @@ export interface AsyncValidator<Fields, Props> {
   (form: Fields, props: Props): Promise<object>;
 }
 
-export interface FormOptions<Fields, Props> {
+export interface FormOptions<Fields = any, Props = any> {
   namespace?: string;
   fields: Fields|{(props: Props): Fields};
   validate?: Validator<Fields, Props>;
@@ -80,7 +81,7 @@ export interface ComponentFactory<Props, ChildProps> {
   (Component: React.ComponentClass<ChildProps>|React.StatelessComponent<ChildProps>): React.ComponentClass<Props>;
 }
 
-export function createForm<Fields = object, Props = object>(opts: FormOptions<Fields, Props>): ComponentFactory<Props, ChildProps<Fields, Props>> {
+export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, Props>): ComponentFactory<Props, ChildProps<Fields, Props>> {
   // Cache options and apply defaults
   const ns = (opts.namespace || "form");
 
@@ -357,7 +358,8 @@ export function createForm<Fields = object, Props = object>(opts: FormOptions<Fi
             // setErrors: this.setErrorsManually,
             isClean: !hasChanges,
             hasErrors: hasErrors,
-            isValid: (allowSubmit && hasChanges && !hasErrors),
+            hasChanges: hasChanges,
+            isValid: (allowSubmit && !hasErrors),
           }
         };
       }
