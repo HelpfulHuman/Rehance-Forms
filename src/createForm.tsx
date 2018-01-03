@@ -16,9 +16,9 @@ export type FieldState<Fields> = {
 
 export type FieldMethods<Fields> = {
   [field in keyof Fields]: {
-    onFocus(ev: SyntheticEvent<any>): void;
-    onChange(ev: SyntheticEvent<any>): void;
-    onBlur(ev: SyntheticEvent<any>): void;
+    onFocus(ev: any): void;
+    onChange(ev: any): void;
+    onBlur(ev: any): void;
   };
 }
 
