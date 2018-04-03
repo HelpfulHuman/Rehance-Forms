@@ -358,6 +358,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
           ...this.props as any,
           [ns]: {
             ...fields as any,
+            getValues: () => this.state.values,
             onSubmit: this.handleSubmit,
             reset: this.handleReset,
             resetWith: this.resetWith,
