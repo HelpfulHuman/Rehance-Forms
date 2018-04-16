@@ -59,6 +59,7 @@ export interface FormState<Fields> {
   values: Fields;
   errors: FieldErrors<Fields>;
   dirty: FieldState<Fields>;
+  isValid: boolean;
 }
 
 export interface Validator<Fields, Props> {
@@ -103,6 +104,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
         values: {} as any,
         errors: {} as any,
         dirty: {} as any,
+        isValid: true,
       };
 
       private methods: FieldMethods<Fields> = {} as any;
@@ -121,6 +123,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
         this.validateAndSetValues = this.validateAndSetValues.bind(this);
         this.setErrorsManually = this.setErrorsManually.bind(this);
         this.resetWith = this.resetWith.bind(this);
+        this.setFormValidation = this.setFormValidation.bind(this);
 
         // Get the values for the form fields
         var fields = getFields(props);
@@ -285,7 +288,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
           allowSubmit: false,
           focused: name,
           dirty: { ...state.dirty as any, [name]: dirty },
-          values: { ...state.values as any, [name]: value },
+          values: { ...this.state.values as any, [name]: value },
         }));
       }
 
@@ -334,6 +337,22 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
         }
       }
 
+      setFormValidation(stateValues, props) {
+        return new Promise((accept, reject) => {
+          var res = validate(stateValues, props) as any;
+          res.then(() => {
+            if (!this.state.isValid) {
+              this.setState({ isValid: true });
+            }
+          })
+          .catch(() => {
+            if (this.state.isValid) {
+              this.setState({ isValid: false });
+            }
+          });
+        });
+      };
+
       /**
        * Generate an object of props that will be passed down to the component children.
        */
@@ -367,14 +386,14 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
             isClean: !hasChanges,
             hasErrors: hasErrors,
             hasChanges: hasChanges,
-            isValid: (allowSubmit && !hasErrors),
+            isValid: this.state.isValid,
           }
         };
       }
 
       render() {
         var {children, ...props} = this.getChildProps() as any;
-
+        this.setFormValidation(this.state.values, this.props);
         return (
           <Component {...props}>
             {children}
