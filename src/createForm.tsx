@@ -288,7 +288,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
           allowSubmit: false,
           focused: name,
           dirty: { ...state.dirty as any, [name]: dirty },
-          values: { ...this.state.values as any, [name]: value },
+          values: { ...state.values as any, [name]: value },
         }));
       }
 
