@@ -321,7 +321,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
       /**
        * Manually set the error messages.
        */
-      setErrorsManually(errors: FieldErrors<Fields>): void {
+      setErrorsManually(): void {
         let response: any = validate(this.state.values, this.props);
         response.then()
         .catch((errors) => {
