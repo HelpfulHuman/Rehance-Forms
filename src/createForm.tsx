@@ -322,10 +322,11 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
        * Manually set the error messages.
        */
       setErrorsManually(errors: FieldErrors<Fields>): void {
-        this.setState({
-          errors: (errors || {}),
-          hasErrors: (!!errors),
-        } as any);
+        let response: any = validate(this.state.values, this.props);
+        response.then()
+        .catch((errors) => {
+          this.setState({ errors: errors || {}, hasErrors: true });
+        })
       }
 
       /**
@@ -382,7 +383,7 @@ export function createForm<Fields = any, Props = any>(opts: FormOptions<Fields, 
             reset: this.handleReset,
             resetWith: this.resetWith,
             setValues: this.validateAndSetValues,
-            // setErrors: this.setErrorsManually,
+            setErrors: this.setErrorsManually,
             isClean: !hasChanges,
             hasErrors: hasErrors,
             hasChanges: hasChanges,
