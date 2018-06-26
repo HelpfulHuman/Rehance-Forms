@@ -8,13 +8,13 @@
   "scripts": {
     "preversion": "npm test",
     "version": "npm run build",
-    "postversion": "git push origin master && git push origin master --tags",
     "clean": "rm -rf dist/",
     "build": "rollup -c",
     "watch": "npm run build -- --watch",
     "test": "mocha",
     "tdd": "npm run watch | npm run test -- --watch",
-    "prepublish": "npm run clean && npm run build && npm run test"
+    "prepublish": "npm run clean && npm run build && npm run test",
+    "postpublish": "git push origin master && git push origin master --tags"
   },
   "dependencies": {
     "react": "^16.1.1"
@@ -37,7 +37,6 @@
   "keywords": [
     "react",
     "enhancements",
-    "hoc",
     "utilities",
     "form",
     "forms"
