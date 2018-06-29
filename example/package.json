@@ -11,17 +11,18 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/react": "^16.0.22",
-    "@types/react-dom": "^16.0.3",
+    "@types/react": "^16.4.4",
+    "@types/react-dom": "^16.0.6",
     "@webpack-blocks/typescript": "^1.0.0-rc",
     "html-webpack-plugin": "^2.30.1",
+    "typescript": "^2.9.2",
     "webpack": "^3.6.0",
     "webpack-blocks": "^1.0.0-rc.2",
     "webpack-dev-server": "^2.8.2"
   },
   "dependencies": {
-    "react": "^16.1.1",
-    "react-dom": "^16.1.1",
-    "yup": "^0.23.0"
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "rehance-forms": "^2.2.2"
   }
 }
