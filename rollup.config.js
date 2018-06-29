@@ -5,13 +5,11 @@ export default {
   input: "src/index.tsx",
   output: [
     { file: "dist/index.js", format: "cjs" },
-    { file: "example/src/stateside/index.js", format: "cjs" },
     { file: "dist/index.es.js", format: "es" },
+    { file: "example/src/lib/index.js", format: "cjs" }
   ],
+  preferBuiltins: true,
   exports: "named",
-  external: ["react"],
-  plugins: [
-    resolve({ main: true, jsnext: true }),
-    typescript(),
-  ],
+  external: ["events", "react"],
+  plugins: [resolve({ main: true, jsnext: true }), typescript()]
 };
