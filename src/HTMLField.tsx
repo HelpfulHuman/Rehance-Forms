@@ -51,9 +51,11 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   }
 
   protected format(input: any, output: string | null): any {
-    if (!this.props.format) return (output || input);
+    if (!this.props.format) {
+      return (output || input);
+    }
     return this.props.format(input, output);
-  };
+  }
 
   protected bindRef(el: ElementType) {
     const firstBind = !this.element;
@@ -78,7 +80,9 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
     const error = this.validateSelf();
     form.setField(name, { error, touched: true });
 
-    if (onBlur) onBlur(ev);
+    if (onBlur) {
+      onBlur(ev);
+    }
   }
 
   protected handleChange(ev: React.ChangeEvent<ElementType>) {
@@ -92,7 +96,9 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
       form.setValue(name, value);
     }
 
-    if (onChange) onChange(ev);
+    if (onChange) {
+      onChange(ev);
+    }
   }
 
   protected validateSelf() {
