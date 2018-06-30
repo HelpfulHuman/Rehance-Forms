@@ -11,8 +11,12 @@ export type SubmitButtonProps =
 
 class _SubmitButton extends React.PureComponent<WithContextProps<SubmitButtonProps>> {
 
+  static displayName = "SubmitButton";
+
   static defaultProps: Partial<SubmitButtonProps> = {
-    disabled() { return false; },
+    disabled(form: FormContext) {
+      return form.hasErrors();
+    },
   };
 
   unsubFormUpdate: Function;

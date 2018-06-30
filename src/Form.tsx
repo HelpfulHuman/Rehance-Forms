@@ -187,6 +187,19 @@ export class Form extends React.Component<FormProps> {
   }
 
   /**
+   * Returns true if any field has an error.
+   */
+  private hasErrors = () => {
+    for (let key in this.errors) {
+      if (!!this.errors[key]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Set the error state of all fields.
    */
   private setErrors = (errors: StringMap, replace: boolean = false) => {
