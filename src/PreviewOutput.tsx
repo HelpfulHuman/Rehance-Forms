@@ -21,9 +21,8 @@ export class PreviewOutput extends React.PureComponent<PreviewOutputProps> {
   }
 
   render() {
-
     return (
-      <Subscriber name={name}>
+      <Subscriber name={this.props.name}>
         {this.renderContent}
       </Subscriber>
     );
