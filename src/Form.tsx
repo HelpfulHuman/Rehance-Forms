@@ -42,7 +42,7 @@ export class Form extends React.Component<FormProps> {
   constructor(props: FormProps, context: any) {
     super(props, context);
 
-    this.values = props.initialValues!;
+    this.values = { ...props.initialValues };
     this.errors = {};
     this.touched = {};
     this.events = new EventEmitter();
