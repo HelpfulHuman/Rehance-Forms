@@ -32,7 +32,8 @@ export interface FormContext {
   wasTouched(field: string): boolean;
   onFormUpdate(fn: () => void): () => void;
   onFieldUpdate(fn: (field: string) => void): () => void;
-  triggerUpdate(...fields: string[]): void;
+  triggerFormUpdate(): void;
+  triggerFieldUpdate(...fields: string[]): void;
   reset(): void;
 }
 

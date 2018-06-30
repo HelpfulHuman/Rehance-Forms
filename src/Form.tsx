@@ -65,7 +65,8 @@ export class Form extends React.Component<FormProps> {
       wasTouched: this.wasTouched,
       onFormUpdate: this.onFormUpdate,
       onFieldUpdate: this.onFieldUpdate,
-      triggerUpdate: this.triggerUpdate,
+      triggerFormUpdate: this.triggerFormUpdate,
+      triggerFieldUpdate: this.triggerFieldUpdate,
     };
   }
 
@@ -91,7 +92,7 @@ export class Form extends React.Component<FormProps> {
     delete this.values[field];
     delete this.errors[field];
     delete this.touched[field];
-    this.events.emit(EVENT_FIELD_UPDATE);
+    this.triggerFieldUpdate(field);
   }
 
   /**
@@ -116,7 +117,7 @@ export class Form extends React.Component<FormProps> {
     this.values = this.props.initialValues!;
     this.errors = {};
     this.touched = {};
-    this.events.emit(EVENT_FORM_UPDATE);
+    this.triggerFormUpdate();
   }
 
   /**
@@ -138,7 +139,7 @@ export class Form extends React.Component<FormProps> {
     this.values[field] = ("value" in nextState ? nextState.value : this.getValue(field));
     this.errors[field] = ("error" in nextState ? nextState.error : this.getError(field))!;
     this.touched[field] = ("touched" in nextState ? nextState.touched : this.wasTouched(field))!;
-    this.events.emit(EVENT_FIELD_UPDATE, field);
+    this.triggerFieldUpdate(field);
   }
 
   /**
@@ -153,7 +154,7 @@ export class Form extends React.Component<FormProps> {
    */
   private setValues = (values: FieldMap, replace: boolean = false) => {
     this.values = replace ? values : { ...this.values, ...values };
-    this.events.emit(EVENT_FORM_UPDATE);
+    this.triggerFormUpdate();
   }
 
   /**
@@ -172,7 +173,7 @@ export class Form extends React.Component<FormProps> {
    */
   private setValue = (field: string, value: any) => {
     this.values[field] = value;
-    this.events.emit(EVENT_FIELD_UPDATE, field);
+    this.triggerFieldUpdate(field);
   }
 
   /**
@@ -187,7 +188,7 @@ export class Form extends React.Component<FormProps> {
    */
   private setErrors = (errors: StringMap, replace: boolean = false) => {
     this.errors = replace ? errors : { ...this.errors, ...errors };
-    this.events.emit(EVENT_FORM_UPDATE);
+    this.triggerFormUpdate();
   }
 
   /**
@@ -202,7 +203,7 @@ export class Form extends React.Component<FormProps> {
    */
   private setError = (field: string, message: string) => {
     this.errors[field] = message;
-    this.events.emit(EVENT_FIELD_UPDATE, field);
+    this.triggerFieldUpdate(field);
   }
 
   /**
@@ -210,7 +211,7 @@ export class Form extends React.Component<FormProps> {
    */
   private setTouched = (field: string, touched: boolean) => {
     this.touched[field] = touched;
-    this.events.emit(EVENT_FIELD_UPDATE, field);
+    this.triggerFieldUpdate(field);
   }
 
   /**
@@ -255,18 +256,20 @@ export class Form extends React.Component<FormProps> {
   private onFieldUpdate = (fn: (field: string) => void) => {
     this.events.on(EVENT_FIELD_UPDATE, fn);
     return () => this.events.off(EVENT_FIELD_UPDATE, fn);
+
+  /**
+   * Trigger an update for a specific field or the whole form.
+   */
+  private triggerFormUpdate = () => {
+    this.events.emit(EVENT_FORM_UPDATE);
   }
 
   /**
    * Trigger an update for a specific field or the whole form.
    */
-  private triggerUpdate = (...fields: string[]) => {
-    if (fields.length === 0) {
-      this.events.emit(EVENT_FORM_UPDATE);
-    } else {
-      for (let field of fields) {
-        this.events.emit(EVENT_FIELD_UPDATE, field);
-      }
+  private triggerFieldUpdate = (...fields: string[]) => {
+    for (let field of fields) {
+      this.events.emit(EVENT_FIELD_UPDATE, field);
     }
   }
 
