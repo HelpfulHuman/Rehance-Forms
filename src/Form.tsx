@@ -246,7 +246,9 @@ export class Form extends React.Component<FormProps> {
    */
   private onFormUpdate = (fn: () => void) => {
     this.events.on(EVENT_FORM_UPDATE, fn);
-    return () => this.events.off(EVENT_FORM_UPDATE, fn);
+    return () => {
+      this.events.removeListener(EVENT_FORM_UPDATE, fn);
+    };
   }
 
   /**
@@ -255,7 +257,10 @@ export class Form extends React.Component<FormProps> {
    */
   private onFieldUpdate = (fn: (field: string) => void) => {
     this.events.on(EVENT_FIELD_UPDATE, fn);
-    return () => this.events.off(EVENT_FIELD_UPDATE, fn);
+    return () => {
+      this.events.removeListener(EVENT_FIELD_UPDATE, fn);
+    };
+  }
 
   /**
    * Trigger an update for a specific field or the whole form.
