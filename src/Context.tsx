@@ -36,6 +36,7 @@ export interface FormContext {
   triggerFormUpdate(): void;
   triggerFieldUpdate(...fields: string[]): void;
   reset(): void;
+  submit(): void;
 }
 
 export const {

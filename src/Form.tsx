@@ -50,6 +50,7 @@ export class Form extends React.Component<FormProps> {
       register: this.register,
       unregister: this.unregister,
       reset: this.reset,
+      submit: this.submit,
       getField: this.getField,
       setField: this.setField,
       getValues: this.getValues,
@@ -245,16 +246,23 @@ export class Form extends React.Component<FormProps> {
   }
 
   /**
-   * Invoke the onSubmit prop with the current form values when submitted.
+   * Submits the form.
    */
-  private handleSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
-    ev.preventDefault();
+  private submit = () => {
     if (this.props.onSubmit) {
       this.props.onSubmit({
         values: this.values,
         errors: this.errors,
       }, this.api);
     }
+  }
+
+  /**
+   * Invoke the onSubmit prop with the current form values when submitted.
+   */
+  private handleSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
+    ev.preventDefault();
+    this.submit();
   }
 
   /**
