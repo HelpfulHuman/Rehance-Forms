@@ -88,7 +88,9 @@ export class Form extends React.Component<FormProps> {
    */
   unregister = (field: string) => {
     const idx = this.registered.indexOf(field);
-    if (idx !== -1) this.registered.splice(idx, 1);
+    if (idx !== -1) {
+      this.registered.splice(idx, 1);
+    }
 
     delete this.values[field];
     delete this.errors[field];

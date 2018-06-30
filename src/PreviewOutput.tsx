@@ -10,7 +10,7 @@ export type PreviewOutputProps = React.HtmlHTMLAttributes<HTMLSpanElement> & {
 export class PreviewOutput extends React.PureComponent<PreviewOutputProps> {
 
   static defaultProps: Partial<PreviewOutputProps> = {
-    format(val: any) { return val },
+    format(val: any) { return val; },
   };
 
   renderContent = (form: FormContext) => {

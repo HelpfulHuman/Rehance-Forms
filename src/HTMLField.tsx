@@ -40,9 +40,9 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   }
 
   componentWillUnmount() {
-    this.props.form.unregister(this.props.name);
     this.unsubFormUpdate();
     this.unsubFieldUpdate();
+    this.props.form.unregister(this.props.name);
   }
 
   protected get value(): string {
