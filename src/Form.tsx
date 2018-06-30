@@ -58,6 +58,7 @@ export class Form extends React.Component<FormProps> {
       setValue: this.setValue,
       getErrors: this.getErrors,
       setErrors: this.setErrors,
+      hasErrors: this.hasErrors,
       getError: this.getError,
       setError: this.setError,
       setTouched: this.setTouched,

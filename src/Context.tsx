@@ -12,7 +12,7 @@ export type FieldState<T = any> = {
   error: string;
   touched: boolean;
   changed: boolean;
-}
+};
 
 export interface FormContext {
   register(field: string, error?: string): void;
@@ -25,6 +25,7 @@ export interface FormContext {
   setValue(field: string, value: any): void;
   getErrors(): StringMap;
   setErrors(errors: StringMap, replace?: boolean): void;
+  hasErrors(): boolean;
   getError(field: string): string;
   setError(field: string, message: string): void;
   setTouched(field: string, touched: boolean): void;
