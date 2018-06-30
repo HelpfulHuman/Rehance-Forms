@@ -3,7 +3,7 @@ import { FormContext } from "./Context";
 import { withForm, WithContextProps } from "./helpers";
 
 export type SubscriberProps = {
-  name: string | string[];
+  field: string | string[] | { (field: string): boolean };
   children(form: FormContext): React.ReactNode;
 };
 
@@ -13,6 +13,18 @@ class _Subscriber extends React.PureComponent<WithContextProps<SubscriberProps>>
 
   private unsubFormUpdate: Function;
   private unsubFieldUpdate: Function;
+  private shouldUpdate: { (field: string): boolean };
+
+  constructor(props: WithContextProps<SubscriberProps>, context: any) {
+    super(props, context);
+    this.bindUpdateCheck(props.field);
+  }
+
+  componentWillReceiveProps(nextProps: WithContextProps<SubscriberProps>) {
+    if (this.props.field !== nextProps.field) {
+      this.bindUpdateCheck(nextProps.field);
+    }
+  }
 
   componentWillMount() {
     this.unsubFormUpdate = this.props.form.onFormUpdate(this.forceUpdate.bind(this));
@@ -24,11 +36,18 @@ class _Subscriber extends React.PureComponent<WithContextProps<SubscriberProps>>
     this.unsubFieldUpdate();
   }
 
-  protected handleFieldUpdate(field: string) {
-    const name = this.props.name;
-    const observed = (typeof name === "string" ? [name] : name);
+  protected bindUpdateCheck(fieldProp: any) {
+    if (typeof fieldProp === "function") {
+      this.shouldUpdate = fieldProp;
+    } else if (typeof fieldProp === "string") {
+      this.shouldUpdate = (field) => field === fieldProp;
+    } else {
+      this.shouldUpdate = (field) => fieldProp.indexOf(field) !== -1;
+    }
+  }
 
-    if (observed.indexOf(field) !== -1) {
+  protected handleFieldUpdate(field: string) {
+    if (this.shouldUpdate(field)) {
       this.forceUpdate();
     }
   }

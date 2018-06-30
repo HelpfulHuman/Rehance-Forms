@@ -22,7 +22,7 @@ export class PreviewOutput extends React.PureComponent<PreviewOutputProps> {
 
   render() {
     return (
-      <Subscriber name={this.props.name}>
+      <Subscriber field={this.props.name}>
         {this.renderContent}
       </Subscriber>
     );
