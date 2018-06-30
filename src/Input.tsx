@@ -11,6 +11,10 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
 
   static displayName = "Input";
 
+  static defaultProps = {
+    type: "text",
+  };
+
   render() {
     const { form, validate, validateOnChange, format, ...props } = this.props;
 
