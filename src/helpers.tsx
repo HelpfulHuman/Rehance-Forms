@@ -11,11 +11,15 @@ export type WithContextProps<ChildProps> = ChildProps & {
  * the render prop for FormConsumer.
  */
 export function withForm<ChildProps = {}>(Component: React.ComponentType<WithContextProps<ChildProps>>) {
-  return React.forwardRef<any, ChildProps>(function (props, ref) {
+  const Result = React.forwardRef<any, ChildProps>(function (props, ref) {
     return (
       <FormConsumer>
         {context => <Component {...props} form={context!} ref={ref!} />}
       </FormConsumer>
     );
   });
+
+  Result.displayName = (Component.displayName || Component.name);
+
+  return Result;
 }
