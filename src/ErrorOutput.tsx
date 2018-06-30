@@ -4,19 +4,20 @@ import { FormContext } from "./Context";
 
 export type ErrorOutputProps = React.HtmlHTMLAttributes<HTMLSpanElement> & {
   name: string;
+  alwaysShow?: boolean;
 };
 
 export class ErrorOutput extends React.PureComponent<ErrorOutputProps> {
 
   renderContent = (form: FormContext) => {
-    const { name, ...props } = this.props;
+    const { name, alwaysShow, ...props } = this.props;
     const error = form.getError(name);
 
-    if (!error || !form.wasTouched(name)) {
-      return <React.Fragment />;
+    if (!!error && (form.wasTouched(name) || alwaysShow)) {
+      return <span {...props}>{error}</span>;
     }
 
-    return <span {...props}>{error}</span>;
+    return <React.Fragment />;
   }
 
   render() {
