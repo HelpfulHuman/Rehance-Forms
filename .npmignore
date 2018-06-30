@@ -1,4 +1,6 @@
 src/
 test/
 example/
+.rpt2_cache/
 tsconfig.json
+rollup.config.js
