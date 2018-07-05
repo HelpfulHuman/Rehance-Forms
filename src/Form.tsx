@@ -15,6 +15,8 @@ export type FormOutput = {
 };
 
 export type FormProps = {
+  className?: string;
+  style?: React.CSSProperties;
   initialValues?: FieldMap;
   onSubmit?(output: FormOutput, form: FormContext): void;
   children?: JSX.Element | JSX.Element[] | RenderProp;
@@ -304,7 +306,12 @@ export class Form extends React.Component<FormProps> {
 
   render() {
     return (
-      <form noValidate onSubmit={this.handleSubmit}>
+      <form
+        noValidate
+        className={this.props.className}
+        style={this.props.style}
+        onSubmit={this.handleSubmit}
+      >
         <FormProvider value={this.api}>
           {
             typeof this.props.children === "function" ?
