@@ -19,7 +19,14 @@ function LoginForm() {
         <ErrorOutput name="email" className="Errors" />
       </div>
       <div>
-        <Input type="password" name="password" required min={8} max={24} placeholder="Password" />
+        <Input
+          type="password"
+          name="password"
+          required
+          minLength={8}
+          maxLength={26}
+          placeholder="Password"
+        />
         <ErrorOutput name="password" />
       </div>
       <SubmitButton>
