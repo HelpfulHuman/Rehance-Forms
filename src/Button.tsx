@@ -38,8 +38,8 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
 
     // bail immediately if the standard disabled prop is (or returns) true
     if (
-      typeof disabled === "function" && disabled(form) ||
-      (typeof disabled === "boolean" && disabled)
+      (disabled === true) ||
+      (typeof disabled === "function" && disabled(form))
     ) {
       return true;
     }
