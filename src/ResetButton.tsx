@@ -3,26 +3,33 @@ import { Omit } from "./types";
 import { FormContext } from "./Context";
 import { Button } from "./Button";
 
-export type SubmitButtonProps =
-  & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "disabled">
+export type ResetButtonProps =
+  & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">
   & {
     disabledOnError?: true | string[];
     disabledUntilChanged?: true | string[];
     disabled?: boolean | { (form: FormContext): boolean };
   };
 
-export class SubmitButton extends React.PureComponent<SubmitButtonProps> {
+export class ResetButton extends React.PureComponent<ResetButtonProps> {
 
-  static defaultProps: Partial<SubmitButtonProps> = {
+  static defaultProps: Partial<ResetButtonProps> = {
     disabledOnError: true,
     disabledUntilChanged: true,
   };
+
+  private handleClick = (ev: React.MouseEvent<HTMLButtonElement>, form: FormContext) => {
+    form.reset();
+  }
 
   render() {
     const { children, ...props } = this.props;
 
     return (
-      <Button type="submit" {...props}>
+      <Button
+        {...props}
+        onClickWithForm={this.handleClick}
+      >
         {children}
       </Button>
     );

@@ -25,11 +25,11 @@ export interface FormContext {
   setValue(field: string, value: any): void;
   getErrors(): StringMap;
   setErrors(errors: StringMap, replace?: boolean): void;
-  hasErrors(): boolean;
+  hasErrors(...fields: string[]): boolean;
   getError(field: string): string;
   setError(field: string, message: string): void;
   setTouched(field: string, touched: boolean): void;
-  hasChanged(field: string): boolean;
+  hasChanged(...fields: string[]): boolean;
   wasTouched(field: string): boolean;
   onFormUpdate(fn: () => void): () => void;
   onFieldUpdate(fn: (field: string) => void): () => void;

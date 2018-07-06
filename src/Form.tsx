@@ -192,9 +192,13 @@ export class Form extends React.Component<FormProps> {
   /**
    * Returns true if any field has an error.
    */
-  private hasErrors = () => {
-    for (let key in this.errors) {
-      if (!!this.errors[key]) {
+  private hasErrors = (...fields: string[]) => {
+    if (fields.length === 0) {
+      fields = Object.keys(this.errors);
+    }
+
+    for (let field of fields) {
+      if (!!this.errors[field]) {
         return true;
       }
     }
@@ -236,8 +240,18 @@ export class Form extends React.Component<FormProps> {
   /**
    * Returns true if a specific field has been altered from its original state.
    */
-  private hasChanged = (field: string) => {
-    return (this.props.initialValues![field] !== this.values[field]);
+  private hasChanged = (...fields: string[]) => {
+    if (fields.length === 0) {
+      fields = Object.keys(this.values);
+    }
+
+    for (let field of fields) {
+      if (this.props.initialValues![field] !== this.values[field]) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
