@@ -56,7 +56,7 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
     // disabledUntilChange prop is set
     if (!!disabledUntilChanged) {
       let fields = (Array.isArray(disabledUntilChanged) ? disabledUntilChanged : []);
-      if (form.hasChanged(...fields)) {
+      if (!form.hasChanged(...fields)) {
         return true;
       }
     }
