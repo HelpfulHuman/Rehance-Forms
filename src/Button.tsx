@@ -75,7 +75,7 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
   }
 
   render() {
-    const { form, disabled, onClickWithForm, children, ...props } = this.props;
+    const { form, disabled, disabledOnError, disabledUntilChanged, onClickWithForm, children, ...props } = this.props;
 
     return (
       <button
