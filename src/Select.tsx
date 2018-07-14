@@ -19,6 +19,20 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
 
   static displayName = "Select";
 
+  protected bindRef(el: HTMLSelectElement) {
+    const firstBind = !this.element;
+    this.element = el;
+
+    // we trigger validation and set the value (if any) on first bind because
+    // the element is not yet available otherwise
+    if (firstBind) {
+      this.props.form.setField(this.props.name, {
+        error: this.validateSelf(),
+        value: el.value,
+      });
+    }
+  }
+
   protected renderOption = (option: SelectOption, idx: number) => {
     return (
       <option key={idx} value={option.value}>
