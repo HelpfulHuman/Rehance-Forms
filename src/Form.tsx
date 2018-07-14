@@ -19,7 +19,7 @@ export type FormProps = {
   style?: React.CSSProperties;
   initialValues?: FieldMap;
   onSubmit?(output: FormOutput, form: FormContext): void;
-  children?: JSX.Element | JSX.Element[] | RenderProp;
+  children?: React.ReactNode | RenderProp;
 };
 
 export type FormState = {
