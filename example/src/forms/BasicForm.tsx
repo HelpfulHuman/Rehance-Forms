@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, Input, ErrorOutput, SubmitButton } from "../lib";
+import { Form, Input, ErrorOutput, SubmitButton } from "rehance-forms";
 import { FormWrapper } from "./FormWrapper";
 
 export class BasicForm extends React.PureComponent {

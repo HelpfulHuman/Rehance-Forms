@@ -6,7 +6,7 @@ export default {
   output: [
     { file: "dist/index.js", format: "cjs" },
     { file: "dist/index.es.js", format: "es" },
-    { file: "example/src/lib/index.js", format: "cjs" }
+    // { file: "example/src/lib/index.js", format: "cjs" }
   ],
   preferBuiltins: true,
   exports: "named",

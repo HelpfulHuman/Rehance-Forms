@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, Input } from "../lib";
+import { Form, Input } from "rehance-forms";
 import { FormWrapper } from "./FormWrapper";
 import { PreviewOutput } from "../lib";
 

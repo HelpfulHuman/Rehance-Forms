@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form, Input, Subscriber, ErrorOutput, Select, SubmitButton } from "../lib";
+import { Form, Input, Subscriber, ErrorOutput, Select, SubmitButton } from "rehance-forms";
 import { FormWrapper } from "./FormWrapper";
 
 export class MultiFieldSubscriber extends React.PureComponent {
