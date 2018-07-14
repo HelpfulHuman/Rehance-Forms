@@ -1,3 +1,4 @@
+export * from "./bindAsField";
 export * from "./Button";
 export * from "./ClearButton";
 export * from "./Context";
