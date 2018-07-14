@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Form, Input } from "rehance-forms";
 import { FormWrapper } from "./FormWrapper";
-import { ErrorOutput } from "../lib";
+import { ErrorOutput } from "rehance-forms";
 
 export class InputWithErrors extends React.PureComponent {
 

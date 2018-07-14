@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Form, Input } from "rehance-forms";
 import { FormWrapper } from "./FormWrapper";
-import { PreviewOutput } from "../lib";
+import { PreviewOutput } from "rehance-forms";
 
 export class InputWithPreview extends React.PureComponent {
 
