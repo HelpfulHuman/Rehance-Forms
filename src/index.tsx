@@ -12,3 +12,4 @@ export * from "./Select";
 export * from "./SubmitButton";
 export * from "./Subscriber";
 export * from "./TextArea";
+export { Toggle, ToggleProps, RenderToggleProps } from "./Toggle";

@@ -140,6 +140,36 @@ Validation handling for `<Select>` is identical to [validation handling for `<In
 />
 ```
 
+### `Toggle`
+
+The `<Toggle>` component is for creating custom `boolean` switches in place of a traditional `<input type="checkbox" />` element. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onToggle` event prop (for external change effects) and requires a `name` prop to be provided.
+
+#### Customize With CSS
+
+The first approach will create a single `<span>` element and apply the base `className`, along with, the appropriate classes for active and disabled states.
+
+```tsx
+// the classes used here are the default classes provided by the component
+<Toggle
+  name="enableFeature"
+  className="Toggle"
+  activeClassName="isActive"
+  disabledClassName="isDisabled"
+/>
+```
+
+#### Completely Custom Markup
+
+Using a child render prop, custom markup can be supplied in the function and will be provided with the current `value`, the component `disabled` state and an `onToggle` function for toggling the current value (when `disabled` is `false`).
+
+```tsx
+<Toggle name="enableFeature">
+  {({ value, disabled, onToggle }) => (
+    <span onClick={onToggle}>{value ? "On" : "Off"}</span>
+  )}
+</Toggle>
+```
+
 ### `<Subscriber>`
 
 The `<Subscriber>` component provides a quick and easy way to subscribe to specific field and form changes. It simply needs `field` prop for describing what fields should trigger a re-render. This `field` prop can be `string` containing the field name, an `array` of strings containing multiple field names or a function that determines whether it should update by returning a `boolean` value.
