@@ -20,8 +20,8 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
     disabled: false,
   };
 
-  unsubFormUpdate: Function;
-  unsubFieldUpdate: Function;
+  private unsubFormUpdate: Function;
+  private unsubFieldUpdate: Function;
 
   componentWillMount() {
     this.unsubFormUpdate = this.props.form.onFormUpdate(() => this.forceUpdate());
