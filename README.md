@@ -138,10 +138,10 @@ The `<Input>` and `<TextArea>` components are simple wrappers around the default
 // custom function
 <Input
   type="text"
-  className={({ hasError, wasTouched }) => (
+  className={({ value, error, changed, touched }) => (
     "MyCustomInput" +
-    (hasError ? " isInvalid" : "") +
-    (wasTouched ? " isDirty" : " isClean")
+    (!!error ? " isInvalid" : "") +
+    (touched ? " isDirty" : " isClean")
   )}
 />
 ```
