@@ -4,8 +4,9 @@ import { Omit } from "./types";
 import { HTMLFieldComponent, FieldProps } from "./HTMLField";
 
 export type InputProps =
-  & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "form">
-  & FieldProps<HTMLInputElement>;
+  & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "checked" | "form">
+  & FieldProps<HTMLInputElement>
+  & { checkedValue: any };
 
 export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElement> {
 
@@ -16,15 +17,22 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
   };
 
   render() {
-    const { form, validate, validateOnChange, format, ...props } = this.props;
+    let { form, validate, validateOnChange, format, className, checkedValue, ...props } = this.props;
+
+    const isCheckable = this.props.type === "checkbox" || this.props.type === "radio";
+    const currentValue = this.value;
+    const value = (isCheckable ? checkedValue : currentValue || "");
+    const checked = (isCheckable && checkedValue === currentValue);
 
     return (
       <input
         {...props}
+        className={this.classes}
         ref={this.bindRef}
-        value={this.value || ""}
+        value={value}
         onBlur={this.handleBlur}
         onChange={this.handleChange}
+        checked={checked}
       />
     );
   }
