@@ -16,6 +16,14 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
     type: "text",
   };
 
+  private handleCheckbox = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    if (this.value === this.props.checkedValue) {
+      ev = { ...ev, target: { ...ev.target, value: "" } };
+    }
+
+    this.handleChange(ev);
+  }
+
   render() {
     let { form, validate, validateOnChange, format, className, checkedValue, ...props } = this.props;
 
@@ -23,6 +31,7 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
     const currentValue = this.value;
     const value = (isCheckable ? checkedValue : currentValue || "");
     const checked = (isCheckable && checkedValue === currentValue);
+    const onChange = this.props.type === "checkbox" ? this.handleCheckbox : this.handleChange;
 
     return (
       <input
@@ -31,7 +40,7 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
         ref={this.bindRef}
         value={value}
         onBlur={this.handleBlur}
-        onChange={this.handleChange}
+        onChange={onChange}
         checked={checked}
       />
     );
