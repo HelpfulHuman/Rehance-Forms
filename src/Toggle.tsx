@@ -13,6 +13,7 @@ export type ToggleProps = {
 export type RenderToggleProps = {
   value: boolean;
   disabled: boolean;
+  toggle(): void;
   onToggle(): void;
 };
 
@@ -50,6 +51,7 @@ export class _Toggle extends React.PureComponent<WithFieldProps<ToggleProps>> {
     const field: RenderToggleProps = {
       disabled: !!this.props.disabled,
       value: !!this.props.field.value,
+      toggle: this.handleToggle,
       onToggle: this.handleToggle,
     };
 

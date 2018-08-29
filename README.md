@@ -161,7 +161,7 @@ Validation handling for `<Select>` is identical to [validation handling for `<In
 
 ### `<Toggle>`
 
-The `<Toggle>` component is for creating custom `boolean` switches in place of a traditional `<input type="checkbox" />` element. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onToggle` event prop (for external change effects) and requires a `name` prop to be provided.
+The `<Toggle>` component is for creating custom `boolean` switches in place of a traditional `<input type="checkbox" />` element. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `toggle` event prop (for external change effects) and requires a `name` prop to be provided.
 
 #### Customize With CSS
 
