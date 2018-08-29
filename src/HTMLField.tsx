@@ -1,13 +1,17 @@
 import * as React from "react";
 import { WithContextProps } from "./helpers";
 import { FieldMap } from "./types";
+import { FieldState } from "./Context";
 
 export interface Formatter {
   (input: any | null, output: string | null): any;
 }
 
+export type GetClassName = (field: FieldState) => string;
+
 export type FieldProps<ElementType> = {
   name: string;
+  className?: string | GetClassName;
   validateOnChange?: boolean;
   format?: Formatter;
   validate?(field: string, values: FieldMap): string | null;
@@ -48,6 +52,16 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   protected get value(): string {
     const value = this.props.form.getValue(this.props.name);
     return this.format(value, null);
+  }
+
+  protected get classes(): string {
+    const { className, name, form } = this.props;
+
+    if (typeof className !== "function") {
+      return className as string;
+    }
+
+    return className(form.getField(name));
   }
 
   protected format(input: any, output: string | null): any {
