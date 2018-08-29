@@ -69,6 +69,18 @@ The 2 React context components for providing and accessing a form API. If you'd 
 
 The `<Input>` and `<TextArea>` components are direct abstractions over the standard `<input>` and `<textarea>` elements. They support nearly all of the standard props for their base elements, with a few exceptions. They automatically handle state management for input value and error states.
 
+#### Checkboxes and Radios
+
+Because this library manages the values of your fields from a top down approach, you cannot set the `value` for each field directly.  For checkboxes and radios, this can be an issue since `value` is used to denote the value of the field when the element is considered "checked".  You can get around this issue by padding the `checkedValue` prop.
+
+```tsx
+// checkbox
+<Input type="checkbox" name="exampleCheckbox" checkedValue="1" />
+
+// radio
+<Input type="radio" name="exampleRadio" checkedValue="blue" />
+```
+
 #### Validation Basics
 
 Native browser validation is supported by default for these fields. This means you can simply set the `required` prop if a field is required or provide the `type="email"` prop if the `<input>` needs to be an email address.
