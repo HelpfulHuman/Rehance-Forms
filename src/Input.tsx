@@ -6,7 +6,7 @@ import { HTMLFieldComponent, FieldProps } from "./HTMLField";
 export type InputProps =
   & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "checked" | "form">
   & FieldProps<HTMLInputElement>
-  & { checkedValue: any };
+  & { checkedValue?: any };
 
 export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElement> {
 
