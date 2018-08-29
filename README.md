@@ -115,6 +115,25 @@ function formatToObject(input, output) {
 }
 ```
 
+#### Customizations
+
+The `<Input>` and `<TextArea>` components are simple wrappers around the default `<input>` and `<texarea>` elements and can be easily customized using CSS rules like `input`, `input:focused` and `input:disabled`. However, for greater control you can customize the CSS the controls using custom CSS classes via the `className` prop. You can either pass a `string` value, or if you need access to the field's state, you can supply a function.
+
+```tsx
+// string value
+<Input type="text" className="MyCustomInput" />
+
+// custom function
+<Input
+  type="text"
+  className={({ hasError, wasTouched }) => (
+    "MyCustomInput" +
+    (hasError ? " isInvalid" : "") +
+    (wasTouched ? " isDirty" : " isClean")
+  )}
+/>
+```
+
 ### `<Select>`
 
 The `<Select>` component is a direct abstraction of the standard `<select>` _and_ `<option>` elements. Rather than requiring the `<option>` children be provided manually, an `options` prop can be provided containing an array of `{ value: string, label: string }` objects for each option to be rendered.

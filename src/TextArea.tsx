@@ -12,11 +12,12 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
   static displayName = "TextArea";
 
   render() {
-    const { form, validate, validateOnChange, format, ...props } = this.props;
+    const { form, validate, validateOnChange, format, className, ...props } = this.props;
 
     return (
       <textarea
         {...props}
+        className={this.classes}
         ref={this.bindRef}
         value={this.value || ""}
         onBlur={this.handleBlur}

@@ -42,11 +42,12 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
   }
 
   render() {
-    const { form, validate, validateOnChange, options, children, ...props } = this.props;
+    const { form, validate, validateOnChange, className, options, children, ...props } = this.props;
 
     return (
       <select
         {...props}
+        className={this.classes}
         ref={this.bindRef}
         value={this.value || ""}
         onBlur={this.handleBlur}
