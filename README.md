@@ -175,7 +175,7 @@ Validation handling for `<Select>` is identical to [validation handling for `<In
 
 The `<Toggle>` component is for creating custom `boolean` switches in place of a traditional `<input type="checkbox" />` element. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onToggle` event prop (for external change effects) and requires a `name` prop to be provided.
 
-#### Customize With CSS
+#### Customize `Toggle` With CSS
 
 The first approach will create a single `<span>` element and apply the base `className`, along with, the appropriate classes for active and disabled states.
 
@@ -190,7 +190,7 @@ The first approach will create a single `<span>` element and apply the base `cla
 />
 ```
 
-#### Completely Custom Markup
+#### Completely Custom `Toggle` Markup
 
 Using a child render prop, custom markup can be supplied in the function and will be provided with the current `value`, the component `disabled` state and a `toggle` function for toggling the current value (when `disabled` is `false`).
 
@@ -206,7 +206,7 @@ Using a child render prop, custom markup can be supplied in the function and wil
 
 The `<Radio>` component is extremely similar to the `<Toggle>` component and offers a quick way to create a customizable "radio" selection type of control. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onChange` event prop (for external change effects) and requires `name` and `value` props to be provided.
 
-#### Customize With CSS
+#### Customize `Radio` With CSS
 
 The first approach will create a single `<span>` element and apply the base `className`, along with, the appropriate classes for active and disabled states.
 
@@ -232,7 +232,7 @@ This approach also allows you to enable the ability for the radio option to be d
 </Radio>
 ```
 
-#### Completely Custom Markup
+#### Completely Custom `Radio` Markup
 
 Using a child render prop, custom markup can be supplied in the function and will be provided with the component's value, the current `groupValue`, the component's `disabled` state and 2 field mutation methods: `select` and `deselect`. When using this approach, the `allowSelect` prop is _not_ taken into account.
 
