@@ -71,7 +71,7 @@ The `<Input>` and `<TextArea>` components are direct abstractions over the stand
 
 #### Checkboxes and Radios
 
-Because this library manages the values of your fields from a top down approach, you cannot set the `value` for each field directly.  For checkboxes and radios, this can be an issue since `value` is used to denote the value of the field when the element is considered "checked".  You can get around this issue by padding the `checkedValue` prop.
+Because this library manages the values of your fields from a top down approach, you cannot set the `value` for each field directly. For checkboxes and radios, this can be an issue since `value` is used to denote the value of the field when the element is considered "checked". You can get around this issue by padding the `checkedValue` prop.
 
 ```tsx
 // checkbox
@@ -241,7 +241,7 @@ Using a child render prop, custom markup can be supplied in the function and wil
 
 ```tsx
 <Radio name="favoriteColor" value="green">
-  {({ groupValue, value, selected, disabled, select, deselect, toggle }) => (
+  {({ groupValue, value, selected, disabled, select, deselect }) => (
     <span onClick={selected ? deselect : select}>
       {value} {selected ? "(Selected)" : ""}
     </span>
