@@ -11,5 +11,6 @@ export * from "./ResetButton";
 export * from "./Select";
 export * from "./SubmitButton";
 export * from "./Subscriber";
+export { Radio, RadioProps, RenderRadioProps } from "./Radio";
 export * from "./TextArea";
 export { Toggle, ToggleProps, RenderToggleProps } from "./Toggle";

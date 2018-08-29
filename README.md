@@ -161,7 +161,7 @@ Validation handling for `<Select>` is identical to [validation handling for `<In
 
 ### `<Toggle>`
 
-The `<Toggle>` component is for creating custom `boolean` switches in place of a traditional `<input type="checkbox" />` element. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `toggle` event prop (for external change effects) and requires a `name` prop to be provided.
+The `<Toggle>` component is for creating custom `boolean` switches in place of a traditional `<input type="checkbox" />` element. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onToggle` event prop (for external change effects) and requires a `name` prop to be provided.
 
 #### Customize With CSS
 
@@ -174,19 +174,67 @@ The first approach will create a single `<span>` element and apply the base `cla
   className="Toggle"
   activeClassName="isActive"
   disabledClassName="isDisabled"
+  onToggle={enabled => alert(enabled)}
 />
 ```
 
 #### Completely Custom Markup
 
-Using a child render prop, custom markup can be supplied in the function and will be provided with the current `value`, the component `disabled` state and an `onToggle` function for toggling the current value (when `disabled` is `false`).
+Using a child render prop, custom markup can be supplied in the function and will be provided with the current `value`, the component `disabled` state and a `toggle` function for toggling the current value (when `disabled` is `false`).
 
 ```tsx
 <Toggle name="enableFeature">
-  {({ value, disabled, onToggle }) => (
-    <span onClick={onToggle}>{value ? "On" : "Off"}</span>
+  {({ value, disabled, toggle }) => (
+    <span onClick={toggle}>{value ? "On" : "Off"}</span>
   )}
 </Toggle>
+```
+
+### `<Radio>`
+
+The `<Radio>` component is extremely similar to the `<Toggle>` component and offers a quick way to create a customizable "radio" selection type of control. This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onChange` event prop (for external change effects) and requires `name` and `value` props to be provided.
+
+#### Customize With CSS
+
+The first approach will create a single `<span>` element and apply the base `className`, along with, the appropriate classes for active and disabled states.
+
+```tsx
+// the classes used here are the default classes provided by the component
+<Radio
+  name="favoriteColor"
+  value="green"
+  className="Radio"
+  activeClassName="isActive"
+  disabledClassName="isDisabled"
+  onChange={state => alert(state)}
+>
+  Green
+</Radio>
+```
+
+This approach also allows you to enable the ability for the radio option to be deselected on subsequent clicks after it's already active/selected. You can do this by supplying an `allowDeselect` prop. When the radio is deselected, it sets the value as `null`.
+
+```tsx
+<Radio name="favoriteColor" value="green" allowDeselect>
+  Green
+</Radio>
+```
+
+#### Completely Custom Markup
+
+Using a child render prop, custom markup can be supplied in the function and will be provided with the component's value, the current `groupValue`, the component's `disabled` state and 2 field mutation methods: `select` and `deselect`. When using this approach, the `allowSelect` prop is _not_ taken into account.
+
+- `select()` will set the radio group's value to the component's set `value`.
+- `deselect()` will set the radio group's value `null`.
+
+```tsx
+<Radio name="favoriteColor" value="green">
+  {({ groupValue, value, selected, disabled, select, deselect, toggle }) => (
+    <span onClick={selected ? deselect : select}>
+      {value} {selected ? "(Selected)" : ""}
+    </span>
+  )}
+</Radio>
 ```
 
 ### `<Subscriber>`

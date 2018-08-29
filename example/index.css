@@ -193,6 +193,7 @@ pre {
   background: red;
   border-radius: 10em;
   cursor: pointer;
+  font-size: 1.75em;
 }
 
 .Toggle.isActive {
@@ -214,4 +215,28 @@ pre {
 .Toggle.isActive:before {
   left: auto;
   right: 0.1em;
+}
+
+.Radios {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Radios .Radio {
+  width: 100%;
+}
+
+.Radio {
+  display: block;
+  margin: 1em;
+  padding: 1em;
+  text-align: center;
+  border-radius: 10em;
+  border: solid 2px #333;
+  cursor: pointer;
+}
+
+.Radio.isActive {
+  background: #333;
+  color: #fff;
 }

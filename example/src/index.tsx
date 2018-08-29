@@ -6,6 +6,7 @@ import { MultiFieldSubscriber } from "./forms/MultiFieldSubscriber";
 import { BasicForm } from "./forms/BasicForm";
 import { InputWithErrors } from "./forms/InputWithErrors";
 import { ValidateOnChange } from "./forms/ValidationOnChange";
+import { VariousControls } from "./forms/VariousControls";
 
 render(
   <div>
@@ -14,6 +15,7 @@ render(
     <InputWithErrors />
     <ValidateOnChange />
     <BasicForm />
+    <VariousControls />
     <LoginForm />
   </div>
   , document.getElementById("root")
