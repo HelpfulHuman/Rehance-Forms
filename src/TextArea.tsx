@@ -4,7 +4,7 @@ import { Omit } from "./types";
 import { HTMLFieldComponent, FieldProps } from "./HTMLField";
 
 export type TextAreaProps =
-  & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "form">
+  & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "className" | "value" | "form">
   & FieldProps<HTMLTextAreaElement>;
 
 export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTextAreaElement> {

@@ -9,7 +9,7 @@ export type SelectOption = {
 };
 
 export type SelectProps =
-  & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "value" | "form">
+  & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "className" | "value" | "form">
   & FieldProps<HTMLSelectElement>
   & {
     options?: SelectOption[];
