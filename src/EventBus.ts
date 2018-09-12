@@ -1,11 +1,15 @@
+import { EventEmitter } from "events";
 import { BaseContext } from "./ScopeContext";
+import { randomRange } from "./utils";
 
-const asyncTrigger = ("requestAnimationFrame" in window ? requestAnimationFrame : (fn: Function) => setTimeout(fn, 0));
+const events = new EventEmitter();
+events.setMaxListeners(Infinity);
 
 export type EventBusSubscriber = (ev: FormEvent) => void;
 
 export enum FormEventSignal {
   SubmitForm,
+  ScopeUpdate,
   FieldUpdate,
 }
 
@@ -17,22 +21,13 @@ export type FormEvent = {
 
 export class EventBus {
 
-  private _subscribers: EventBusSubscriber[] = [];
+  private _id: string = `eventbus_${randomRange(100000000, 999999999)}`;
 
   /**
    * Trigger the bus using the given event context.
    */
   public trigger = (ev: FormEvent) => {
-    let subs = this._subscribers.slice(0);
-    const triggerNext = () => {
-      let sub = subs.shift();
-      if (sub) {
-        sub(ev);
-        asyncTrigger(triggerNext);
-      }
-    }
-
-    triggerNext();
+    events.emit(this._id, ev);
   }
 
   /**
@@ -40,14 +35,9 @@ export class EventBus {
    * the given subscriber.
    */
   public listen = (subscriber: EventBusSubscriber) => {
-    if (this._subscribers.indexOf(subscriber) === -1) {
-      this._subscribers.push(subscriber);
-    }
+    events.addListener(this._id, subscriber);
     return () => {
-      let i = this._subscribers.indexOf(subscriber);
-      if (i !== -1) {
-        this._subscribers.splice(i, 1);
-      }
+      events.removeListener(this._id, subscriber);
     };
   }
 

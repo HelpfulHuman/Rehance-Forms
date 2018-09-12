@@ -4,7 +4,7 @@ import { FormWrapper } from "./FormWrapper";
 
 export class MultiFieldSubscriber extends React.PureComponent {
 
-  handleSubmit = ({ values }: any) => {
+  handleSubmit = (values: any) => {
     this.setState({ ...values });
   }
 
@@ -14,7 +14,9 @@ export class MultiFieldSubscriber extends React.PureComponent {
         <Form onSubmit={this.handleSubmit}>
           <div>
             <Subscriber field={["firstName", "lastName"]}>
-              {({ getValue }) => <span>Full Name: {getValue("firstName")} {getValue("lastName")}</span>}
+              {(scope) => (
+                <span>Full Name: {scope.get("firstName")} {scope.get("lastName")}</span>
+              )}
             </Subscriber>
           </div>
           <div>

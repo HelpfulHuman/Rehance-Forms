@@ -5,7 +5,7 @@ import { PreviewOutput } from "rehance-forms";
 
 export class InputWithPreview extends React.PureComponent {
 
-  handleSubmit = ({ values }: any) => {
+  handleSubmit = (values: any) => {
     this.setState({ ...values });
   }
 

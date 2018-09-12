@@ -121,9 +121,10 @@ export class ScopeContext extends BaseContext implements IScopeChild {
     [key: string]: ScopeChild;
   };
 
-  constructor(initialValues: FieldMap = {}, parentScope: null | ScopeContext = null) {
+  constructor(initialValues: FieldMap = {}, parentScope: null | BaseContext = null) {
     super(parentScope);
     this._initialValues = initialValues;
+    this._children = {};
   }
 
   /**
@@ -177,7 +178,7 @@ export class ScopeContext extends BaseContext implements IScopeChild {
       this._children[name] = new FieldContext(initialValue);
     }
 
-    if (this._children[name]! instanceof FieldContext) {
+    if (!(this._children[name] instanceof FieldContext)) {
       console.warn(`"${name} is not a FieldContext type child of scope! Returning an empty FieldContext object instead.`);
       return new FieldContext(this.initialValues[name] || null);
     }
@@ -230,6 +231,13 @@ export class ScopeContext extends BaseContext implements IScopeChild {
     }
   }
 
+  /**
+   * Convenience method for getting a single value from the scope.
+   */
+  public get(field: string, fallback: any = null) {
+    return (this._children[field] ? this._children[field].value : fallback);
+  }
+
 }
 
 
@@ -245,6 +253,7 @@ export class ListScopeContext extends BaseContext {
   constructor(initialValues: FieldMap[] = [], parentScope: null | BaseContext = null) {
     super(parentScope);
     this._initialValues = initialValues;
+    this._children = initialValues.map(value => new ScopeContext(value, this));
   }
 
   /**
@@ -255,23 +264,24 @@ export class ListScopeContext extends BaseContext {
   }
 
   /**
-   * Adds a new child context to the list scope.
+   * Returns the array of children.
    */
-  public addChildScope(scope: ScopeContext) {
-    this._children.push(scope);
+  public get children() {
+    return this._children;
   }
 
   /**
-   * Removes a child context from the list scope via reference.
+   * Adds a new child context to the list scope.
    */
-  public clearChildScope(scope: ScopeContext) {
-    this._children.filter(child => child !== scope);
+  public addChildScope(values: FieldMap) {
+    this._children.push(new ScopeContext(values, this));
   }
 
   /**
    * Splices a specific child by index.
    */
-  public spliceChildScopes(index: number) {
+  public removeChildScope(index: number) {
+    if (index < 0 || index >= this._children.length) { return; }
     this._children.splice(index, 1);
   }
 

@@ -1,9 +1,13 @@
 import * as React from "react";
-import { FieldMap } from "./types";
-import { CollectionScopeItemChildrenProps, CollectionScopeItem } from "./CollectionScopeItem";
 import { WithFormScopeProps, withFormScope } from "./helpers";
-import { FormEvent } from "./EventBus";
-import { ListScopeContext } from "./ScopeContext";
+import { FormEvent, FormEventSignal } from "./EventBus";
+import { ListScopeContext, ScopeContext, FormScopeProvider } from "./ScopeContext";
+
+export type CollectionScopeItemChildrenProps = {
+  index: number;
+  scope: ScopeContext;
+  removeItem(): void;
+};
 
 export type CollectionScopeProps = {
   name: string;
@@ -19,7 +23,7 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
   static displayName: string = "CollectionScope";
 
   private scope: ListScopeContext;
-  private keyOffset = 1;
+  // private keyOffset = 1;
   private unsubscribe: Function;
 
   /**
@@ -28,6 +32,12 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
   public componentWillMount() {
     const { formScope, name } = this.props;
     let values: any[] = formScope.initialValues[name] || [];
+
+    if (!Array.isArray(values)) {
+      console.warn(`The value for ${this.props.name} is not an array!  Value will be overridden with an array by CollectionScope.`);
+      values = [];
+    }
+
     this.scope = new ListScopeContext(values, formScope);
     formScope.setChild(this.props.name, this.scope);
     this.unsubscribe = formScope.listen(this.handleScopeEvent);
@@ -45,11 +55,9 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
    * Triggers a re-render, only when the array has had an update triggered.
    */
   private handleScopeEvent = (ev: FormEvent) => {
-    if (
-      ev.field === this.props.name &&
-      !ev.scope.isDescendentOf(this.props.formScope)
-    ) {
-      this.keyOffset += 1;
+    const isSameOrAncestorScope = ev.scope.isAncestorOf(this.scope);
+    if ((!ev.field || ev.field === this.props.name) && isSameOrAncestorScope) {
+      // this.keyOffset += 1;
       this.forceUpdate();
     }
   }
@@ -58,26 +66,25 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
    * Handles the removal of a single item.
    */
   private handleItemRemoval = (index: number) => {
-    let arr: any[] = this.props.form.getValue(this.props.name, []).slice(0);
-    arr.splice(index, 1);
-    this.props.form.setValue(this.props.name, arr);
+    this.scope.removeChildScope(index);
+    this.scope.broadcast(FormEventSignal.FieldUpdate, this.props.name);
   }
 
   /**
    * Renders a scoped form for each item in the array.
    */
-  private renderItemScoped = (value: FieldMap = {}, idx: number) => {
+  private renderItemScoped = (scope: ScopeContext, idx: number) => {
     return (
-      <CollectionScopeItem
-        key={(idx + 1) * this.keyOffset}
-        index={idx}
-        initialValues={value}
-        parentScope={this.props.form}
-        onChange={this.handleItemUpdate}
-        onRemove={this.handleItemRemoval}
+      <FormScopeProvider
+        key={scope.id}
+        value={scope}
       >
-        {this.props.children}
-      </CollectionScopeItem>
+        {this.props.children({
+          index: idx,
+          scope: scope,
+          removeItem: () => this.handleItemRemoval(idx),
+        })}
+      </FormScopeProvider>
     );
   }
 
@@ -85,15 +92,9 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
    * Renders the collection scopes.
    */
   public render() {
-    let arr = this.props.form.getValue(this.props.name, []);
-    if (!Array.isArray(arr)) {
-      console.warn(`CollectionScope with name of "${this.props.name}" references a non-array value!`);
-      return (<React.Fragment />);
-    }
-
     return (
       <React.Fragment>
-        {arr.map(this.renderItemScoped)}
+        {this.scope.children.map(this.renderItemScoped)}
       </React.Fragment>
     );
 

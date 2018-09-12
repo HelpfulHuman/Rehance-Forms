@@ -1,15 +1,15 @@
 import * as React from "react";
-import { FormContext, FormProvider } from "./Context";
 import { FieldMap } from "./types";
-import { FormScopeContext } from "./FormScopeContext";
+import { ScopeContext, ListScopeContext, FormScopeProvider } from "./ScopeContext";
+import { FormEvent } from "./EventBus";
 
 export type CollectionScopeItemChildrenProps = {
-  scope: FormContext;
+  scope: ScopeContext;
   removeItem(): void;
 };
 
 export type CollectionScopeItemProps = {
-  parentScope: FormContext;
+  parentScope: ListScopeContext;
   initialValues?: FieldMap;
   index: number;
   children(scope: CollectionScopeItemChildrenProps): React.ReactNode;
@@ -23,28 +23,26 @@ export class CollectionScopeItem extends React.Component<CollectionScopeItemProp
     initialValues: {},
   };
 
-  private scopedApi: FormContext;
-  private unsubFieldUpdate: Function;
+  private scope: ScopeContext;
+  private unsubscribe: Function;
 
   constructor(props: CollectionScopeItemProps, context: any) {
     super(props, context);
-    this.scopedApi = new FormScopeContext(props.initialValues, props.parentScope);
-    this.unsubFieldUpdate = this.scopedApi.onFieldUpdate(this.handleChange);
+    this.unsubscribe = props.parentScope.listen(this.handleScopeEvents);
   }
 
   /**
    * Unsubscribe from the field updates.
    */
-  componentWillUnmount() {
-    this.unsubFieldUpdate();
+  public componentWillUnmount() {
+    this.unsubscribe();
   }
 
   /**
    * Handle field change on the scope.
    */
-  private handleChange = () => {
-    console.log("scope item handle change triggered");
-    this.props.onChange(this.props.index, this.scopedApi.getValues());
+  private handleScopeEvents = (ev: FormEvent) => {
+
   }
 
   /**
@@ -57,14 +55,14 @@ export class CollectionScopeItem extends React.Component<CollectionScopeItemProp
   /**
    * Render the item scope.
    */
-  render() {
+  public render() {
     return (
-      <FormProvider value={this.scopedApi}>
+      <FormScopeProvider value={this.scope}>
         {this.props.children({
-          scope: this.scopedApi,
+          scope: this.scope,
           removeItem: this.handleRemove,
         })}
-      </FormProvider>
+      </FormScopeProvider>
     );
   }
 

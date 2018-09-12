@@ -4,7 +4,7 @@ import { FormWrapper } from "./FormWrapper";
 
 export class LoginForm extends React.PureComponent {
 
-  handleSubmit = ({ values }: any) => {
+  handleSubmit = (values: any) => {
     this.setState({ ...values });
   }
 

@@ -4,7 +4,7 @@ import { FormWrapper } from "./FormWrapper";
 
 export class VariousControls extends React.PureComponent {
 
-  handleSubmit = ({ values }: any) => {
+  handleSubmit = (values: any) => {
     this.setState({ ...values });
   }
 
@@ -52,13 +52,13 @@ export class VariousControls extends React.PureComponent {
           }}>
             How about custom toggle components?
             <Toggle name="exampleToggle">
-              {({ value, onToggle }) => (
-                <span onClick={onToggle}>{value ? "You betcha!" : "Still custom"}</span>
+              {({ value, toggle }) => (
+                <span onClick={toggle}>{value ? "You betcha!" : "Still custom"}</span>
               )}
             </Toggle>
           </div>
           <div style={{ margin: "1em 0" }}>
-            What about radio options?
+            What about custom radio options?
             <div className="Radios">
               <Radio name="radios" value="yup">Yup!</Radio>
               <Radio name="radios" value="maybe">Maybe</Radio>

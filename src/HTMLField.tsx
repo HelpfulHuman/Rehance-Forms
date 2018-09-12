@@ -30,6 +30,10 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   constructor(props: WithFormScopeProps<Props>, context: any) {
     super(props, context);
 
+    if (!props.formScope) {
+      console.error("You have tried to add a form element outside of a form scope!  Wrap this element in a <Form> component.");
+    }
+
     // this is to make sure we don't break inheritance
     this.bindRef = this.bindRef.bind(this);
     this.handleScopeEvent = this.handleScopeEvent.bind(this);

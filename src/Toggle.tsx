@@ -17,7 +17,7 @@ export type RenderToggleProps = {
   onToggle(): void;
 };
 
-export class _Toggle extends React.PureComponent<WithFieldProps<ToggleProps>> {
+export class _Toggle extends React.Component<WithFieldProps<ToggleProps>> {
 
   static defaultProps: Partial<ToggleProps> = {
     className: "Toggle",

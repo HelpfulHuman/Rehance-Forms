@@ -20,8 +20,9 @@ export type CustomFieldProps<ChildProps> = ChildProps & {
 
 export type FieldState = {
   value: any;
-  error?: string | null;
+  error: string | null;
   touched: boolean;
+  changed: boolean;
 };
 
 export function bindAsField<ChildProps extends object = {}>(
@@ -95,14 +96,23 @@ export function bindAsField<ChildProps extends object = {}>(
      * Render the child component for the field.
      */
     public render() {
-      const field = { ...this.state, update: this.update };
+      const { formScope, ...props } = this.props as any;
+      const field: FieldState & FieldMutations = {
+        value: this.fieldState.value,
+        error: this.fieldState.error,
+        touched: this.fieldState.touched,
+        changed: this.fieldState.changed,
+        update: this.update,
+      };
 
       return (
         <Component
-          name={this.props.name}
-          scope={this.props.formScope}
+          {...props}
+          scope={formScope}
           field={field}
-        />
+        >
+          {this.props.children}
+        </Component>
       );
     }
 

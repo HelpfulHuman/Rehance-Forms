@@ -155,6 +155,10 @@ button {
   color: #fff;
 }
 
+button:disabled {
+  background: #999;
+}
+
 pre {
   margin: 1em auto;
   padding: 1em;

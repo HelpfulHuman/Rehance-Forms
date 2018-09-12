@@ -5,7 +5,7 @@ import { ErrorOutput } from "rehance-forms";
 
 export class ValidateOnChange extends React.PureComponent {
 
-  handleSubmit = ({ values }: any) => {
+  handleSubmit = (values: any) => {
     this.setState({ ...values });
   }
 
