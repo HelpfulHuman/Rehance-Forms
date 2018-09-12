@@ -1,19 +1,27 @@
 import * as React from "react";
-import { FormContext, FieldState, FieldStatePartial } from "./Context";
-import { WithContextProps, withForm } from "./helpers";
+import { withFormScope, WithFormScopeProps } from "./helpers";
+import { FormEvent, FormEventSignal } from "./EventBus";
+import { FieldContext } from "./FieldContext";
+import { ScopeContext } from "./ScopeContext";
 
 export type FieldMutations = {
-  update(nextState: FieldStatePartial<any>): void;
+  update(nextState: Partial<FieldState>): void;
 };
 
 export type WithFieldProps<ChildProps> = ChildProps & {
   name: string;
   field: FieldState & FieldMutations;
-  form: FormContext;
+  scope: ScopeContext;
 };
 
 export type CustomFieldProps<ChildProps> = ChildProps & {
   name: string;
+};
+
+export type FieldState = {
+  value: any;
+  error?: string | null;
+  touched: boolean;
 };
 
 export function bindAsField<ChildProps extends object = {}>(
@@ -21,42 +29,80 @@ export function bindAsField<ChildProps extends object = {}>(
 ) {
   const name = Component.displayName || Component.name;
 
-  return withForm<CustomFieldProps<ChildProps>>(class extends React.PureComponent<WithContextProps<CustomFieldProps<ChildProps>>> {
+  return withFormScope<CustomFieldProps<ChildProps>>(class extends React.PureComponent<WithFormScopeProps<CustomFieldProps<ChildProps>>, FieldState> {
 
     static displayName = `Field(${name})`;
 
-    form: FormContext;
-    unsubFormUpdate: Function;
-    unsubFieldUpdate: Function;
+    private fieldState: FieldContext;
 
-    componentWillMount() {
-      this.props.form.register(this.props.name);
-      this.unsubFormUpdate = this.props.form.onFormUpdate(this.forceUpdate.bind(this));
-      this.unsubFieldUpdate = this.props.form.onFieldUpdate(this.handleFieldUpdate);
+    private unsubscribe: Function;
+
+    /**
+     * Register the field with the parent scope and add a subscriber to
+     * the scope updates.
+     */
+    public componentWillMount() {
+      const scope: ScopeContext = this.props.formScope;
+      this.fieldState = scope.field(this.props.name);
+      this.unsubscribe = scope.listen(this.handleScopeEvents);
     }
 
-    componentWillUnmount() {
-      this.unsubFormUpdate();
-      this.unsubFieldUpdate();
-      this.props.form.unregister(this.props.name);
+    /**
+     * Unregister the field from the parent scope and unsubscribe from scope events.
+     */
+    public componentWillUnmount() {
+      this.props.formScope.clearChild(this.props.name);
+      this.unsubscribe();
     }
 
-    handleFieldUpdate = (name: string) => {
-      if (this.props.name === name) {
+    /**
+     * Handle updates from the current scope that this field belongs to.
+     */
+    private handleScopeEvents = (ev: FormEvent) => {
+      const scope: ScopeContext = this.props.formScope;
+      if (!ev.field && ev.scope.isAncestorOf(scope) || ev.field === this.props.name) {
         this.forceUpdate();
       }
     }
 
-    update = (nextState: FieldStatePartial<any>) => {
-      this.form.setField(this.props.name, nextState);
+    /**
+     * Update the state for the form field.
+     */
+    public update = (nextState: Partial<FieldState>) => {
+      if ("value" in nextState) {
+        this.fieldState.value = nextState.value;
+      }
+
+      if ("error" in nextState) {
+        this.fieldState.error = nextState.error || null;
+      }
+
+      if ("touched" in nextState) {
+        this.fieldState.touched = !!nextState.touched;
+      }
+
+      this.triggerUpdate();
     }
 
-    render() {
-      const state = this.props.form.getField(this.props.name);
-      const field = { ...state, update: this.update };
+    /**
+     * Trigger a scope update for the field.
+     */
+    private triggerUpdate = () => {
+      this.props.formScope.broadcast(FormEventSignal.FieldUpdate, this.props.name);
+    }
+
+    /**
+     * Render the child component for the field.
+     */
+    public render() {
+      const field = { ...this.state, update: this.update };
 
       return (
-        <Component {...this.props} field={field} />
+        <Component
+          name={this.props.name}
+          scope={this.props.formScope}
+          field={field}
+        />
       );
     }
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Subscriber } from "./Subscriber";
-import { FormContext } from "./Context";
+import { ScopeContext } from "./ScopeContext";
 
 export type PreviewOutputProps = React.HtmlHTMLAttributes<HTMLSpanElement> & {
   name: string;
@@ -13,14 +13,20 @@ export class PreviewOutput extends React.PureComponent<PreviewOutputProps> {
     format(val: any) { return val; },
   };
 
-  renderContent = (form: FormContext) => {
+  /**
+   * Render the content for the preview output.
+   */
+  public renderContent = (scope: ScopeContext) => {
     const { name, format, ...props } = this.props;
-    const value = form.getValue(name);
+    const field = scope.field(name);
 
-    return <span {...props}>{format!(value)}</span>;
+    return <span {...props}>{format!(field.value)}</span>;
   }
 
-  render() {
+  /**
+   * Render the component.
+   */
+  public render() {
     return (
       <Subscriber field={this.props.name}>
         {this.renderContent}

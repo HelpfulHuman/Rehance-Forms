@@ -1,7 +1,8 @@
+export { AddCollectionItem, AddCollectionItemProps } from "./AddCollectionItem";
 export * from "./bindAsField";
 export * from "./Button";
 export * from "./ClearButton";
-export * from "./Context";
+export { CollectionScope, CollectionScopeProps } from "./CollectionScope";
 export * from "./ErrorOutput";
 export * from "./Form";
 export * from "./helpers";
@@ -12,5 +13,6 @@ export * from "./Select";
 export * from "./SubmitButton";
 export * from "./Subscriber";
 export { Radio, RadioProps, RenderRadioProps } from "./Radio";
+export { Scope, ScopeProps } from "./Scope";
 export * from "./TextArea";
 export { Toggle, ToggleProps, RenderToggleProps } from "./Toggle";

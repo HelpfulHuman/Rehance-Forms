@@ -31,23 +31,35 @@ export class _Radio extends React.PureComponent<WithFieldProps<RadioProps>> {
     disabledClassName: "isDisabled",
   };
 
-  private setValue(nextValue: any) {
+  /**
+   * Update the value across the radio field.
+   */
+  private setValue(value: any) {
     if (!this.props.disabled) {
-      this.props.form.setValue(this.props.name, this.props.value);
+      this.props.field.update({ value });
       if (this.props.onChange) {
-        this.props.onChange(nextValue);
+        this.props.onChange(value);
       }
     }
   }
 
+  /**
+   * Sets the value of the radio field to the value provided via props.
+   */
   private handleSelect = () => {
     this.setValue(this.props.value);
   }
 
+  /**
+   * Nullifies the radio field value.
+   */
   private handleDeselect = () => {
     this.setValue(null);
   }
 
+  /**
+   * Toggle the radio state between the set prop value and a null state.
+   */
   private handleToggle = () => {
     const { field, value } = this.props;
 
@@ -58,6 +70,9 @@ export class _Radio extends React.PureComponent<WithFieldProps<RadioProps>> {
     }
   }
 
+  /**
+   * Render the default radio component.
+   */
   private renderRadio({ selected, disabled }: RenderRadioProps) {
     const p = this.props;
     const onClick = (p.allowDeselect ? this.handleToggle : this.handleSelect);
@@ -73,6 +88,9 @@ export class _Radio extends React.PureComponent<WithFieldProps<RadioProps>> {
     );
   }
 
+  /**
+   * Render the radio component.
+   */
   render() {
     const { disabled, field, value } = this.props;
     const fieldProps: RenderRadioProps = {

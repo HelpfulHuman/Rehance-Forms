@@ -1,3 +1,5 @@
+import { EventBus } from "./EventBus";
+
 export type Diff<
   T extends string | number | symbol,
   U extends string | number | symbol
@@ -16,3 +18,18 @@ export type StringMap = {
 export type BoolMap = {
   [field: string]: boolean;
 };
+
+export interface IScopeChild {
+  value: any;
+  valid: boolean;
+  changed: boolean;
+  reset(): void;
+  clear(): void;
+}
+
+export interface IScopeContext extends IScopeChild {
+  readonly root: IScopeContext;
+  readonly parent: IScopeContext | null;
+  readonly events: EventBus;
+  readonly id: string;
+}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { withForm } from "./helpers";
+import { withFormScope } from "./helpers";
 import { Omit } from "./types";
 import { HTMLFieldComponent, FieldProps } from "./HTMLField";
 
@@ -16,6 +16,9 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
     type: "text",
   };
 
+  /**
+   * Handle changes to the element for radios and checkboxes.
+   */
   private handleCheckbox = (ev: React.ChangeEvent<HTMLInputElement>) => {
     if (this.value === this.props.checkedValue) {
       ev = { ...ev, target: { ...ev.target, value: "" } };
@@ -24,8 +27,11 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
     this.handleChange(ev);
   }
 
-  render() {
-    let { form, validate, validateOnChange, format, className, checkedValue, ...props } = this.props;
+  /**
+   * Render the component.
+   */
+  public render() {
+    let { formScope, validate, validateOnChange, format, className, checkedValue, ...props } = this.props;
 
     const isCheckable = this.props.type === "checkbox" || this.props.type === "radio";
     const currentValue = this.value;
@@ -48,4 +54,4 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
 
 }
 
-export const Input = withForm<InputProps>(InputComponent);
+export const Input = withFormScope<InputProps>(InputComponent);

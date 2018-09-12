@@ -1,18 +1,18 @@
 import * as React from "react";
-import { withForm, WithContextProps } from "./helpers";
 import { Omit } from "./types";
-import { FormContext } from "./Context";
+import { withFormScope, WithFormScopeProps } from "./helpers";
+import { ScopeContext } from "./ScopeContext";
 
 export type ButtonProps =
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">
   & {
-    onClickWithForm?(ev: React.MouseEvent<HTMLButtonElement>, form: FormContext): void;
-    disabledOnError?: boolean | string[];
-    disabledUntilChanged?: boolean | string[];
-    disabled?: boolean | { (form: FormContext): boolean };
+    onClickWithScope?(ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext): void;
+    disabledOnError?: boolean;
+    disabledUntilChanged?: boolean;
+    disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 
-class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
+class _Button extends React.PureComponent<WithFormScopeProps<ButtonProps>> {
 
   static displayName = "Button";
 
@@ -20,53 +20,56 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
     disabled: false,
   };
 
-  private unsubFormUpdate: Function;
-  private unsubFieldUpdate: Function;
+  private unsubscribe: Function;
 
-  componentWillMount() {
-    this.unsubFormUpdate = this.props.form.onFormUpdate(() => this.forceUpdate());
-    this.unsubFieldUpdate = this.props.form.onFieldUpdate(() => this.forceUpdate());
+  /**
+   * Subscribe to scope changes and update the button when any
+   * value on the scope has changed.
+   */
+  public componentWillMount() {
+    this.unsubscribe = this.props.formScope.listen(() => this.forceUpdate());
   }
 
-  componentWillUnmount() {
-    this.unsubFormUpdate();
-    this.unsubFieldUpdate();
+  /**
+   * Unsubscribe from scope updates.
+   */
+  public componentWillUnmount() {
+    this.unsubscribe();
   }
 
+  /**
+   * Determines if the button should be disabled.
+   */
   private isDisabled(): boolean {
-    const { form, disabled, disabledOnError, disabledUntilChanged } = this.props;
+    const { formScope, disabled, disabledOnError, disabledUntilChanged } = this.props;
 
     // bail immediately if the standard disabled prop is (or returns) true
     if (
       (disabled === true) ||
-      (typeof disabled === "function" && disabled(form))
+      (typeof disabled === "function" && disabled(formScope))
     ) {
       return true;
     }
 
     // check for form errors if the disabledOnError prop is set
-    if (!!disabledOnError) {
-      let fields = (Array.isArray(disabledOnError) ? disabledOnError : []);
-      if (form.hasErrors(...fields)) {
-        return true;
-      }
+    if (!!disabledOnError && !formScope.valid) {
+      return true;
     }
 
-    // finally, check for changes on the form or specific fields when the
-    // disabledUntilChange prop is set
-    if (!!disabledUntilChanged) {
-      let fields = (Array.isArray(disabledUntilChanged) ? disabledUntilChanged : []);
-      if (!form.hasChanged(...fields)) {
-        return true;
-      }
+    // finally, check for changes on the form when the disabledUntilChange prop is set
+    if (!!disabledUntilChanged && !formScope.changed) {
+      return true;
     }
 
     return false;
   }
 
+  /**
+   * Handles click events for the button.
+   */
   private handleClick = (ev: React.MouseEvent<HTMLButtonElement>) => {
-    if (this.props.onClickWithForm) {
-      this.props.onClickWithForm(ev, this.props.form);
+    if (this.props.onClickWithScope) {
+      this.props.onClickWithScope(ev, this.props.formScope);
     }
 
     if (this.props.onClick) {
@@ -74,8 +77,11 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
     }
   }
 
-  render() {
-    const { form, disabled, disabledOnError, disabledUntilChanged, onClickWithForm, children, ...props } = this.props;
+  /**
+   * Render the button.
+   */
+  public render() {
+    const { form, disabled, disabledOnError, disabledUntilChanged, onClickWithScope, children, ...props } = this.props;
 
     return (
       <button
@@ -90,4 +96,4 @@ class _Button extends React.PureComponent<WithContextProps<ButtonProps>> {
 
 }
 
-export const Button = withForm<ButtonProps>(_Button as any);
+export const Button = withFormScope<ButtonProps>(_Button as any);

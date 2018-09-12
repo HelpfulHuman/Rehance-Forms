@@ -1,13 +1,14 @@
 import * as React from "react";
-import { WithContextProps } from "./helpers";
 import { FieldMap } from "./types";
-import { FieldState } from "./Context";
+import { FieldContext } from "./FieldContext";
+import { WithFormScopeProps } from "./helpers";
+import { FormEventSignal, FormEvent } from "./EventBus";
 
 export interface Formatter {
   (input: any | null, output: string | null): any;
 }
 
-export type GetClassName = (field: FieldState) => string;
+export type GetClassName = (field: FieldContext) => string;
 
 export type FieldProps<ElementType> = {
   name: string;
@@ -20,50 +21,62 @@ export type FieldProps<ElementType> = {
 };
 
 export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, ElementType extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, State = {}>
-  extends React.PureComponent<WithContextProps<Props>, State> {
+  extends React.PureComponent<WithFormScopeProps<Props>, State> {
 
-  private unsubFormUpdate: Function;
-  private unsubFieldUpdate: Function;
+  private unsubscribe: Function;
+  protected field: FieldContext;
   protected element: ElementType;
 
-  constructor(props: WithContextProps<Props>, context: any) {
+  constructor(props: WithFormScopeProps<Props>, context: any) {
     super(props, context);
 
     // this is to make sure we don't break inheritance
     this.bindRef = this.bindRef.bind(this);
-    this.handleFieldUpdate = this.handleFieldUpdate.bind(this);
+    this.handleScopeEvent = this.handleScopeEvent.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.validateSelf = this.validateSelf.bind(this);
   }
 
-  componentWillMount() {
-    this.props.form.register(this.props.name);
-    this.unsubFormUpdate = this.props.form.onFormUpdate(this.forceUpdate.bind(this));
-    this.unsubFieldUpdate = this.props.form.onFieldUpdate(this.handleFieldUpdate.bind(this));
+  /**
+   * Inform the scope that this field exists and subscribe to scope events.
+   */
+  public componentWillMount() {
+    this.field = this.props.formScope.field(this.props.name);
+    this.unsubscribe = this.props.formScope.listen(this.handleScopeEvent);
   }
 
-  componentWillUnmount() {
-    this.unsubFormUpdate();
-    this.unsubFieldUpdate();
-    this.props.form.unregister(this.props.name);
+  /**
+   * Unsubscribe from scope events and clear the field context.
+   */
+  public componentWillUnmount() {
+    this.unsubscribe();
+    this.props.formScope.clearChild(this.props.name);
   }
 
+  /**
+   * Returns the formatted value for the field.
+   */
   protected get value(): string {
-    const value = this.props.form.getValue(this.props.name);
-    return this.format(value, null);
+    return this.format(this.field.value, null);
   }
 
+  /**
+   * Generates and return the class names for the element.
+   */
   protected get classes(): string {
-    const { className, name, form } = this.props;
+    const { className } = this.props;
 
     if (typeof className !== "function") {
       return className as string;
     }
 
-    return className(form.getField(name));
+    return className(this.field);
   }
 
+  /**
+   * Format input using a given formatter prop.
+   */
   protected format(input: any, output: string | null): any {
     if (!this.props.format) {
       return (output || input);
@@ -71,6 +84,16 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
     return this.props.format(input, output);
   }
 
+  /**
+   * Trigger an update for this field.
+   */
+  protected triggerUpdate = () => {
+    this.props.formScope.broadcast(FormEventSignal.FieldUpdate, this.props.name);
+  }
+
+  /**
+   * Bind the element reference for the field.
+   */
   protected bindRef(el: ElementType) {
     const firstBind = !this.element;
     this.element = el;
@@ -78,49 +101,62 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
     // we trigger validation on first bind because element is not available
     // before this to check validation state
     if (firstBind) {
-      this.props.form.setError(this.props.name, this.validateSelf());
+      this.field.error = this.validateSelf();
+      this.triggerUpdate();
     }
   }
 
-  protected handleFieldUpdate(field: string) {
-    if (field === this.props.name) {
+  /**
+   * Process incoming scope events.
+   */
+  protected handleScopeEvent = (ev: FormEvent) => {
+    if (
+      (!ev.field || ev.field === this.props.name) &&
+      ev.scope === this.props.formScope
+    ) {
       this.forceUpdate();
     }
   }
 
+  /**
+   * Handle blur events for this field.
+   */
   protected handleBlur(ev: React.FocusEvent<ElementType>) {
-    const { form, name, onBlur } = this.props;
+    this.field.error = this.validateSelf();
+    this.field.touched = true;
+    this.triggerUpdate();
 
-    const error = this.validateSelf();
-    form.setField(name, { error, touched: true });
-
-    if (onBlur) {
-      onBlur(ev);
+    if (this.props.onBlur) {
+      this.props.onBlur(ev);
     }
   }
 
+  /**
+   * Handle change events for this field.
+   */
   protected handleChange(ev: React.ChangeEvent<ElementType>) {
-    const { form, name, validateOnChange, onChange } = this.props;
     const value = this.format(null, ev.target.value);
 
-    if (validateOnChange) {
-      const error = this.validateSelf();
-      form.setField(name, { value, error });
-    } else {
-      form.setValue(name, value);
+    if (this.props.validateOnChange) {
+      this.field.error = this.validateSelf();
     }
+    this.field.value = value;
+    this.triggerUpdate();
 
-    if (onChange) {
-      onChange(ev);
+    if (this.props.onChange) {
+      this.props.onChange(ev);
     }
   }
 
+  /**
+   * Validates the field and return either the error message or null.
+   */
   protected validateSelf() {
-    const element = this.element as any;
-    const { name, validate, form } = this.props;
+    const element: any = this.element;
+    const { name, validate, formScope } = this.props;
     const result = (
       !!validate ?
-        validate(name, form.getValues()) :
+        validate(name, formScope.value) :
         element.validationMessage
     );
 

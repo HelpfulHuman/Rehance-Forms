@@ -1,7 +1,7 @@
 import * as React from "react";
-import { withForm } from "./helpers";
 import { Omit } from "./types";
 import { HTMLFieldComponent, FieldProps } from "./HTMLField";
+import { withFormScope } from "./helpers";
 
 export type SelectOption = {
   value: string;
@@ -19,6 +19,9 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
 
   static displayName = "Select";
 
+  /**
+   * Bind the select element and set the initial value to the first option.
+   */
   protected bindRef(el: HTMLSelectElement) {
     const firstBind = !this.element;
     this.element = el;
@@ -26,13 +29,15 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
     // we trigger validation and set the value (if any) on first bind because
     // the element is not yet available otherwise
     if (firstBind) {
-      this.props.form.setField(this.props.name, {
-        error: this.validateSelf(),
-        value: el.value,
-      });
+      this.field.value = el.value;
+      this.field.error = this.validateSelf();
+      this.triggerUpdate();
     }
   }
 
+  /**
+   * Render a single option element.
+   */
   protected renderOption = (option: SelectOption, idx: number) => {
     return (
       <option key={idx} value={option.value}>
@@ -41,8 +46,11 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
     );
   }
 
-  render() {
-    const { form, validate, validateOnChange, className, options, children, ...props } = this.props;
+  /**
+   * Renders the select element.
+   */
+  public render() {
+    const { formScope, validate, validateOnChange, className, options, children, ...props } = this.props;
 
     return (
       <select
@@ -60,4 +68,4 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
 
 }
 
-export const Select = withForm<SelectProps>(_Select);
+export const Select = withFormScope<SelectProps>(_Select);

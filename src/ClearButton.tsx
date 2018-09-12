@@ -1,36 +1,42 @@
 import * as React from "react";
 import { Omit } from "./types";
-import { FormContext } from "./Context";
 import { Button } from "./Button";
+import { ScopeContext } from "./ScopeContext";
 
 export type ClearButtonProps =
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">
   & {
-    disabledOnError?: true | string[];
-    disabledUntilChanged?: true | string[];
-    disabled?: boolean | { (form: FormContext): boolean };
+    disabledOnError?: boolean;
+    disabledUntilChanged?: boolean;
+    disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 
 export class ClearButton extends React.PureComponent<ClearButtonProps> {
 
   static defaultProps: Partial<ClearButtonProps> = {
-    disabled(form: FormContext) {
-      const values = form.getValues();
+    disabled(scope: ScopeContext) {
+      const values = scope.value;
       return Object.keys(values).length === 0;
     },
   };
 
-  private handleClick = (ev: React.MouseEvent<HTMLButtonElement>, form: FormContext) => {
-    form.setValues({});
+  /**
+   * Handle the button click.
+   */
+  private handleClick = (ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext) => {
+    scope.clear();
   }
 
-  render() {
+  /**
+   * Render the button.
+   */
+  public render() {
     const { children, ...props } = this.props;
 
     return (
       <Button
         {...props}
-        onClickWithForm={this.handleClick}
+        onClickWithScope={this.handleClick}
       >
         {children}
       </Button>

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { withForm } from "./helpers";
 import { Omit } from "./types";
 import { HTMLFieldComponent, FieldProps } from "./HTMLField";
+import { withFormScope } from "./helpers";
 
 export type TextAreaProps =
   & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "className" | "value" | "form">
@@ -11,8 +11,11 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
 
   static displayName = "TextArea";
 
-  render() {
-    const { form, validate, validateOnChange, format, className, ...props } = this.props;
+  /**
+   * Render the textarea component.
+   */
+  public render() {
+    const { formScope, validate, validateOnChange, format, className, ...props } = this.props;
 
     return (
       <textarea
@@ -28,4 +31,4 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
 
 }
 
-export const TextArea = withForm<TextAreaProps>(TextAreaComponent);
+export const TextArea = withFormScope<TextAreaProps>(TextAreaComponent);

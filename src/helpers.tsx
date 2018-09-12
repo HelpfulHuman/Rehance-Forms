@@ -1,21 +1,21 @@
 import * as React from "react";
-import { FormConsumer, FormContext } from "./Context";
+import { FormScopeConsumer, ScopeContext } from "./ScopeContext";
 
-export type WithContextProps<ChildProps> = ChildProps & {
-  form: FormContext;
-  ref: React.Ref<any>;
+export type WithFormScopeProps<ChildProps> = ChildProps & {
+  formScope: ScopeContext;
+  ref?: React.Ref<any>;
 };
 
 /**
- * Creates a higher-order component that binds the given component as
- * the render prop for FormConsumer.
+ * Creates a higher-order component that binds the given component to the FormScopeConsumer
+ * that provides access to the form scope context API.
  */
-export function withForm<ChildProps = {}>(Component: React.ComponentType<WithContextProps<ChildProps>>) {
+export function withFormScope<ChildProps extends object = {}>(Component: React.ComponentType<WithFormScopeProps<ChildProps>>) {
   const Result = React.forwardRef<any, ChildProps>(function (props, ref) {
     return (
-      <FormConsumer>
-        {context => <Component {...props} form={context!} ref={ref!} />}
-      </FormConsumer>
+      <FormScopeConsumer>
+        {context => <Component {...props} formScope={context!} ref={ref!} />}
+      </FormScopeConsumer>
     );
   });
 

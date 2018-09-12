@@ -14,7 +14,7 @@ export function FormWrapper({ title, result, children }: FormWrapperProps) {
       </header>
       {result && <section>
         <h4>Result:</h4>
-        <pre>{JSON.stringify(result)}</pre>
+        <pre>{JSON.stringify(result, null, 2)}</pre>
       </section>}
       <section>
         {children}

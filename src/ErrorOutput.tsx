@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Subscriber } from "./Subscriber";
-import { FormContext } from "./Context";
+import { ScopeContext } from "./ScopeContext";
 
 export type ErrorOutputProps = React.HtmlHTMLAttributes<HTMLSpanElement> & {
   name: string;
@@ -9,18 +9,24 @@ export type ErrorOutputProps = React.HtmlHTMLAttributes<HTMLSpanElement> & {
 
 export class ErrorOutput extends React.PureComponent<ErrorOutputProps> {
 
-  renderContent = (form: FormContext) => {
+  /**
+   * Render the content error output content.
+   */
+  public renderContent = (scope: ScopeContext) => {
     const { name, alwaysShow, ...props } = this.props;
-    const error = form.getError(name);
+    const field = scope.field(name);
 
-    if (!!error && (form.wasTouched(name) || alwaysShow)) {
-      return <span {...props}>{error}</span>;
+    if (!!field.error && (field.touched || alwaysShow)) {
+      return <span {...props}>{field.error}</span>;
     }
 
     return <React.Fragment />;
   }
 
-  render() {
+  /**
+   * Render the component.
+   */
+  public render() {
     return (
       <Subscriber field={this.props.name}>
         {this.renderContent}

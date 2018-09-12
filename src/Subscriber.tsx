@@ -1,65 +1,87 @@
 import * as React from "react";
-import { FormContext } from "./Context";
-import { withForm, WithContextProps } from "./helpers";
+import { WithFormScopeProps, withFormScope } from "./helpers";
+import { ScopeContext } from "./ScopeContext";
+import { FormEvent } from "./EventBus";
 
 export type SubscriberProps = {
-  field: string | string[] | { (field: string): boolean };
-  children(form: FormContext): React.ReactNode;
+  field: string | string[] | { (ev: FormEvent): boolean };
+  children(scope: ScopeContext): React.ReactNode;
 };
 
-class _Subscriber extends React.PureComponent<WithContextProps<SubscriberProps>> {
+class _Subscriber extends React.PureComponent<WithFormScopeProps<SubscriberProps>> {
 
   static displayName = "Subscriber";
 
-  private unsubFormUpdate: Function;
-  private unsubFieldUpdate: Function;
-  private shouldUpdate: { (field: string): boolean };
+  private unsubscribe: Function;
+  private shouldUpdate: { (ev: FormEvent): boolean };
 
-  constructor(props: WithContextProps<SubscriberProps>, context: any) {
+  constructor(props: WithFormScopeProps<SubscriberProps>, context: any) {
     super(props, context);
     this.bindUpdateCheck(props.field);
   }
 
-  componentWillReceiveProps(nextProps: WithContextProps<SubscriberProps>) {
+  /**
+   * Generate the update predicate when props are changed.
+   */
+  public componentWillReceiveProps(nextProps: WithFormScopeProps<SubscriberProps>) {
     if (this.props.field !== nextProps.field) {
       this.bindUpdateCheck(nextProps.field);
     }
   }
 
-  componentWillMount() {
-    this.unsubFormUpdate = this.props.form.onFormUpdate(this.forceUpdate.bind(this));
-    this.unsubFieldUpdate = this.props.form.onFieldUpdate(this.handleFieldUpdate.bind(this));
+  /**
+   * When the component mounts, subscribe to scope updates.
+   */
+  public componentWillMount() {
+    this.unsubscribe = this.props.formScope.listen(this.handleScopeEvents);
   }
 
-  componentWillUnmount() {
-    this.unsubFormUpdate();
-    this.unsubFieldUpdate();
+  /**
+   * When the component unmounts, unsubscribe from scope updates.
+   */
+  public componentWillUnmount() {
+    this.unsubscribe();
   }
 
+  /**
+   * Generate the update predicate.
+   */
   protected bindUpdateCheck(fieldProp: any) {
     if (typeof fieldProp === "function") {
       this.shouldUpdate = fieldProp;
+    } else if (Array.isArray(fieldProp)) {
+      this.shouldUpdate = (ev: FormEvent) => {
+        return !ev.field || fieldProp.indexOf(ev.field) !== -1;
+      };
     } else if (typeof fieldProp === "string") {
-      this.shouldUpdate = (field) => field === fieldProp;
+      this.shouldUpdate = (ev: FormEvent) => {
+        return !ev.field || ev.field === fieldProp;
+      };
     } else {
-      this.shouldUpdate = (field) => fieldProp.indexOf(field) !== -1;
+      this.shouldUpdate = () => true;
     }
   }
 
-  protected handleFieldUpdate(field: string) {
-    if (this.shouldUpdate(field)) {
+  /**
+   * Determine whether the subscriber should force and update.
+   */
+  protected handleScopeEvents = (ev: FormEvent) => {
+    if (this.shouldUpdate(ev)) {
       this.forceUpdate();
     }
   }
 
-  render() {
+  /**
+   * Render the component.
+   */
+  public render() {
     return (
       <React.Fragment>
-        {this.props.children(this.props.form)}
+        {this.props.children(this.props.formScope)}
       </React.Fragment>
     );
   }
 
 }
 
-export const Subscriber = withForm<SubscriberProps>(_Subscriber);
+export const Subscriber = withFormScope<SubscriberProps>(_Subscriber);

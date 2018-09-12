@@ -25,16 +25,22 @@ export class _Toggle extends React.PureComponent<WithFieldProps<ToggleProps>> {
     disabledClassName: "isDisabled",
   };
 
+  /**
+   * Handle toggle changes on the component.
+   */
   private handleToggle = () => {
     if (!this.props.disabled) {
-      const nextValue = !this.props.field.value;
-      this.props.form.setValue(this.props.name, nextValue);
+      const value = !this.props.field.value;
+      this.props.field.update({ value });
       if (this.props.onToggle) {
-        this.props.onToggle(nextValue);
+        this.props.onToggle(value);
       }
     }
   }
 
+  /**
+   * Render the generic version of the toggle component.
+   */
   private renderToggle({ value, disabled }: RenderToggleProps) {
     const p = this.props;
 
@@ -47,7 +53,10 @@ export class _Toggle extends React.PureComponent<WithFieldProps<ToggleProps>> {
     );
   }
 
-  render() {
+  /**
+   * Render the toggle component.
+   */
+  public render() {
     const field: RenderToggleProps = {
       disabled: !!this.props.disabled,
       value: !!this.props.field.value,

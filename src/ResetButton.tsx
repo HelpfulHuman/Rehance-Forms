@@ -1,14 +1,14 @@
 import * as React from "react";
 import { Omit } from "./types";
-import { FormContext } from "./Context";
 import { Button } from "./Button";
+import { ScopeContext } from "./ScopeContext";
 
 export type ResetButtonProps =
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">
   & {
-    disabledOnError?: true | string[];
-    disabledUntilChanged?: true | string[];
-    disabled?: boolean | { (form: FormContext): boolean };
+    disabledOnError?: boolean;
+    disabledUntilChanged?: boolean;
+    disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 
 export class ResetButton extends React.PureComponent<ResetButtonProps> {
@@ -18,17 +18,23 @@ export class ResetButton extends React.PureComponent<ResetButtonProps> {
     disabledUntilChanged: true,
   };
 
-  private handleClick = (ev: React.MouseEvent<HTMLButtonElement>, form: FormContext) => {
-    form.reset();
+  /**
+   * Handle the button click.
+   */
+  private handleClick = (ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext) => {
+    scope.reset();
   }
 
-  render() {
+  /**
+   * Render the button.
+   */
+  public render() {
     const { children, ...props } = this.props;
 
     return (
       <Button
         {...props}
-        onClickWithForm={this.handleClick}
+        onClickWithScope={this.handleClick}
       >
         {children}
       </Button>

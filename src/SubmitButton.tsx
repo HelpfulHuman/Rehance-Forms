@@ -1,14 +1,14 @@
 import * as React from "react";
 import { Omit } from "./types";
-import { FormContext } from "./Context";
 import { Button } from "./Button";
+import { ScopeContext } from "./ScopeContext";
 
 export type SubmitButtonProps =
-  & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "disabled">
+  & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "disabled" | "form">
   & {
-    disabledOnError?: true | string[];
-    disabledUntilChanged?: true | string[];
-    disabled?: boolean | { (form: FormContext): boolean };
+    disabledOnError?: boolean;
+    disabledUntilChanged?: boolean;
+    disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 
 export class SubmitButton extends React.PureComponent<SubmitButtonProps> {
@@ -18,11 +18,26 @@ export class SubmitButton extends React.PureComponent<SubmitButtonProps> {
     disabledUntilChanged: true,
   };
 
-  render() {
-    const { children, ...props } = this.props;
+  /**
+   * Handle the button click.
+   */
+  private handleClick = (ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext) => {
+    ev.preventDefault();
+    scope.submit();
+
+    if (this.props.onClick) {
+      this.props.onClick(ev);
+    }
+  }
+
+  /**
+   * Render the button.
+   */
+  public render() {
+    const { children, onClick, ...props } = this.props;
 
     return (
-      <Button type="submit" {...props}>
+      <Button type="submit" {...props} onClickWithScope={this.handleClick}>
         {children}
       </Button>
     );
