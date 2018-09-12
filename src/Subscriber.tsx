@@ -4,7 +4,7 @@ import { ScopeContext } from "./ScopeContext";
 import { FormEvent } from "./EventBus";
 
 export type SubscriberProps = {
-  field: string | string[] | { (ev: FormEvent): boolean };
+  field?: string | string[] | { (ev: FormEvent): boolean };
   children(scope: ScopeContext): React.ReactNode;
 };
 

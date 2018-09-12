@@ -20,7 +20,7 @@ import { Form, Input, ErrorOutput, SubmitButton } from "rehance-forms";
 
 function LoginForm() {
   return (
-    <Form onSubmit={({ values }) => /* your code here */}>
+    <Form onSubmit={(values) => /* your code here */}>
       <div>
         <Input
           type="email"
@@ -47,23 +47,15 @@ function LoginForm() {
 }
 ```
 
-## Components
+## Standard Components
 
 ### `<Form>`
 
 The most critical component out of this list, the `Form` component sets up and provides the lightweight form API used by all other components. Unlike the other standard element components provided (`Input`, `TextArea`, `Select`) the `Form` component does not provide a 1-to-1 pass through for the standard `<form>` props (yet).
 
 ```tsx
-<Form onSubmit={({ values, errors }) => console.log(values)}>
-  {/* your content here */}
-</Form>
+<Form onSubmit={values => console.log(values)} />
 ```
-
-### `<FormProvider>` and `<FormConsumer>`
-
-Under the hood, this library is using React's new Context API as a delivery mechanism for a lightweight API that manages the state information for the fields of your form. State changes are not broadcast through the React context as this can quickly cause expensive re-renders on many components at once. Instead, the lightweight API provides access to its own event bus for macro (form) and micro (field) updates, allowing for components to be selective in what they respond to.
-
-The 2 React context components for providing and accessing a form API. If you'd like to know more about the props used by these components you can read the [official React context documentation](https://reactjs.org/docs/context.html#reactcreatecontext) on the subject.
 
 ### `<Input>` and `<TextArea>`
 
@@ -151,6 +143,8 @@ The `<Input>` and `<TextArea>` components are simple wrappers around the default
 The `<Select>` component is a direct abstraction of the standard `<select>` _and_ `<option>` elements. Rather than requiring the `<option>` children be provided manually, an `options` prop can be provided containing an array of `{ value: string, label: string }` objects for each option to be rendered.
 
 Validation handling for `<Select>` is identical to [validation handling for `<Input>` and `<TextArea>`](#validation-basics), as well as, [adding custom formatting](#value-formatting).
+
+Both of the following approaches work with the `<Select>` component.
 
 ```tsx
 // standard approach to <select>
@@ -256,26 +250,33 @@ The `<Subscriber>` component provides a quick and easy way to subscribe to speci
 During a render, it passes the current form API to its child render prop and displays the results.
 
 ```tsx
+// any form changes
+<Subscriber>
+  {scope => (
+    <span>Form/Scope Values: {scope.value}</span>
+  )}
+</Subscriber>
+
 // single field
 <Subscriber field="example">
-  {form => (
-    <span>{form.getValue("example")}</span>
+  {scope => (
+    <span>{scope.get("example")}</span>
   )}
 </Susbcriber>
 
 // multiple fields
 <Subscriber field={["firstName", "lastName"]}>
-  {form => (
+  {scope => (
     <span>
-      {form.getValue("firstName")} {form.getValue("lastName")}
+      {scope.get("firstName")} {scope.get("lastName")}
     </span>
   )}
 </Susbcriber>
 
 // custom field predicate
 <Subscriber field={fieldName => fieldName === "example"}>
-  {form => (
-    <span>{form.getValue("example")}</span>
+  {scope => (
+    <span>{scope.get("example")}</span>
   )}
 </Susbcriber>
 ```
@@ -318,19 +319,7 @@ The `<Button>` component provides a convenient way to create a `<button>` elemen
   disabledOnError
   disabledUntilChanged
 >
-  Action
-</Button>
-```
-
-Additionally, if you only want disable the button when certain fields have errors or until certain fields have changed, you can provide the field names in an array to either (or both props).
-
-```tsx
-<Button
-  onClick={() => /* your code here */}
-  disabledOnError={["example"]}
-  disabledUntilChange={["example"]}
->
-  Action
+  My Custom Action
 </Button>
 ```
 
@@ -339,25 +328,25 @@ If you have a custom need, you can provide a `disabled` prop that accepts a stan
 ```tsx
 <Button
   onClick={() => /* your code here */}
-  disabled={form => form.wasTouched("example")}
+  disabled={scope => /* custom logic here */}
 >
-  Action
+  My Custom Action
 </Button>
 ```
 
-It's likely that you'll need your button to interact with the form instance directly when clicked. To gain access to this convenience, you can supply a function to a `onClickWithForm` prop. The function provided will receive 2 arguments: the first is the mouse event and the second is the form API.
+It's likely that you'll need your button to interact with the form/scope instance directly when clicked. To gain access to this convenience, you can supply a function to a `onClickWithScope` prop. The function provided will receive 2 arguments: the first is the mouse event and the second is the form/scope API.
 
 ```tsx
 <Button
-  onClickWithForm={(ev, form) => /* your code here */}
+  onClickWithScope={(ev, scope) => /* your code here */}
 >
-  Action
+  My Custom Action
 </Button>
 ```
 
 ### `<SubmitButton>`
 
-The `<SubmitButton>` component is a wrapper over top of the previously mentioned [`<Button>` component](#button). It automatically sets the `disabledOnError` and `disabledUntilChanged` props to `true` by default and sets the `type="submit"` prop to trigger form submits when clicked. You can still provide a custom `disabled` prop or override the `disabledOnError` or `disabledUntilChanged` props, if desired.
+The `<SubmitButton>` component is a wrapper over top of the previously mentioned [`<Button>` component](#button). It automatically sets the `disabledOnError` and `disabledUntilChanged` props to `true` by default and submits the form when clicked. You can still provide a custom `disabled` prop or override the `disabledOnError` or `disabledUntilChanged` props, if desired.
 
 ```tsx
 <SubmitButton>Submit</SubmitButton>
@@ -379,14 +368,71 @@ The `<ClearButton>` component is a wrapper over top of the previously mentioned 
 <ClearButton>Clear Fields</ClearButton>
 ```
 
-## Higher-Order Components
+## Scope & State Management
 
-### `withForm()`
+Under the hood, this library is using React's new Context API as a delivery mechanism for a lightweight API that manages the state information for the fields of your form. State changes are not broadcast through the React context as this can quickly cause expensive re-renders on many components at once. Instead, the lightweight API provides access to its own event bus for macro (form/scope) and micro (field) updates, allowing for components to be selective in what they respond to.
 
-The `withForm()` function creates a higher-order component for quickly providing the wrapped component with the form API as a `form` prop. This is simply a utility over top of the `<FormConsumer>` component.
+The underlying form API is referred to as the form scope, and it's not limited to a single level. The form scope can further be broken into child scopes, creating a scope tree for your form.
+
+### `<FormScopeProvider>` and `<FormScopeConsumer>`
+
+The 2 React context components for providing and accessing a form API. If you'd like to know more about the props used by these components you can read the [official React context documentation](https://reactjs.org/docs/context.html#reactcreatecontext) on the subject.
+
+### `<Scope>`
+
+The `<Scope>` component allows you to create a new scope as a child of its parent scope (provided by either `<Form>` or another `<Scope>`). Nested field components will use the new scope provided by this component in place of its parent, allowing for isolation and encapsulation of scope values at this level.
 
 ```tsx
-const Example = withForm(function({ form }) {
+<Form initialValues={{ foo: { bar: "" } }}>
+  <Scope name="foo">
+    <Input name="bar" required />
+    <ErrorOutput name="bar" />
+  </Scope>
+</Form>
+```
+
+### `<CollectionScope>`
+
+The `<CollectionScope>` component is for creating a complex array of scopes for an array value within a form or scope. It takes a child render prop for rendering the scoped field elements for the dynamically created scopes. The render prop is provided with the numeric `index` of the item scope, the item's `scope`, and a `remove` function for removing the item (and its scope) entirely.
+
+```tsx
+<Form initialValues={{ people: [] }}>
+  <CollectionScope name="people">
+    {({ index, scope, remove }) => (
+      <div>
+        <h4>Person #{index}</h4>
+        <Input name="firstName" />
+        <Input name="lastName" />
+        <div>
+          <span onClick={remove}>Remove Person</span>
+        </div>
+      </div>
+    )}
+  </CollectionScope>
+</Form>
+```
+
+### `<AddCollectionItem>`
+
+The `<AddCollectionItem>` component creates a simple button for pushing new values onto an array field or `<CollectionScope>` within the current scope. It requires a `to` prop with the name of the target field or scope to push the value onto and can optionally provide a custom `value` prop. The default value added is an empty object literal.
+
+```tsx
+<div>
+  <CollectionScope name="people">{() => /* render fields */}</CollectionScope>
+  <AddCollectionItem to="people" value={{ name: "" }}>
+    Add Person
+  </AddCollectionItem>
+</div>
+```
+
+## Higher-Order Components
+
+### `withFormScope()`
+
+The `withFormScope()` function creates a higher-order component for quickly providing the wrapped component with the form API as a `formScope` prop. This is simply a utility over top of the `<FormScopeConsumer>` component.
+
+```tsx
+const Example = withFormScope(function({ formScope }) {
   return <div />;
 });
 ```
