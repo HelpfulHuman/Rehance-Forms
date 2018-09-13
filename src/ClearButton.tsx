@@ -6,8 +6,8 @@ import { ScopeContext } from "./ScopeContext";
 export type ClearButtonProps =
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">
   & {
-    disabledOnError?: boolean;
-    disabledUntilChanged?: boolean;
+    disabledOnError?: boolean | string[];
+    disabledUntilChanged?: boolean | string[];
     disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 

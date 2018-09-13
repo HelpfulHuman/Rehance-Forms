@@ -6,8 +6,8 @@ import { ScopeContext } from "./ScopeContext";
 export type SubmitButtonProps =
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "disabled" | "form">
   & {
-    disabledOnError?: boolean;
-    disabledUntilChanged?: boolean;
+    disabledOnError?: boolean | string[];
+    disabledUntilChanged?: boolean | string[];
     disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 
