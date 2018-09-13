@@ -7,8 +7,8 @@ export type ButtonProps =
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">
   & {
     onClickWithScope?(ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext): void;
-    disabledOnError?: boolean;
-    disabledUntilChanged?: boolean;
+    disabledOnError?: boolean | string[];
+    disabledUntilChanged?: boolean | string[];
     disabled?: boolean | { (scope: ScopeContext): boolean };
   };
 
@@ -52,12 +52,22 @@ class _Button extends React.PureComponent<WithFormScopeProps<ButtonProps>> {
     }
 
     // check for form errors if the disabledOnError prop is set
-    if (!!disabledOnError && !formScope.valid) {
+    if (
+      disabledOnError && (
+        (Array.isArray(disabledOnError) && formScope.getErrors(disabledOnError)) ||
+        !formScope.valid
+      )
+    ) {
       return true;
     }
 
     // finally, check for changes on the form when the disabledUntilChange prop is set
-    if (!!disabledUntilChanged && !formScope.changed) {
+    if (
+      disabledUntilChanged && (
+        (Array.isArray(disabledUntilChanged) && formScope.hasChanges(disabledUntilChanged)) ||
+        !formScope.changed
+      )
+    ) {
       return true;
     }
 

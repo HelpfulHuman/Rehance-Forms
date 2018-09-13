@@ -19,6 +19,12 @@ export type BoolMap = {
   [field: string]: boolean;
 };
 
+export type ErrorMap = {
+  [key: string]: ContextError;
+};
+
+export type ContextError = null | string | ErrorMap | ErrorMap[];
+
 export interface IScopeChild {
   value: any;
   valid: boolean;

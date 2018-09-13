@@ -1,7 +1,7 @@
 import * as React from "react";
 import { EventBus, EventBusSubscriber, FormEventSignal } from "./EventBus";
 import { randomRange } from "./utils";
-import { FieldMap, IScopeChild } from "./types";
+import { FieldMap, IScopeChild, ErrorMap } from "./types";
 import { FieldContext } from "./FieldContext";
 
 export type ScopeChild =
@@ -169,6 +169,31 @@ export class ScopeContext extends BaseContext implements IScopeChild {
   }
 
   /**
+   * Returns the errors for this scope and its descendents.
+   */
+  public get error(): null | ErrorMap {
+    return this.getErrors(Object.keys(this._children));
+  }
+
+  /**
+   * Returns the errors for the requested fields or null if no errors were found in
+   * the specified fields.
+   */
+  public getErrors(fields: string[]): null | ErrorMap {
+    let output: ErrorMap = {};
+    let hasErrors = false;
+    for (let key of fields) {
+      let error = this._children[key].error;
+      if (error) {
+        hasErrors = true;
+        output[key] = error;
+      }
+    }
+
+    return (hasErrors ? output : null);
+  }
+
+  /**
    * Returns an existing field or creates a new field context is one does not
    * exist.  The field is automatically added as a child to the scope.
    */
@@ -200,6 +225,20 @@ export class ScopeContext extends BaseContext implements IScopeChild {
   }
 
   /**
+   * Returns true if all of the specified children of this scope are considered valid.
+   */
+  public areValid(fields: string[]): boolean {
+    for (let key of fields) {
+      let child = this._children[key];
+      if (child && !child.valid) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * Returns true if any of the fields have in the current scope have changed.
    */
   public get changed(): boolean {
@@ -210,6 +249,20 @@ export class ScopeContext extends BaseContext implements IScopeChild {
     }
 
     return false;
+  }
+
+  /**
+   * Returns true if any of the specified children of this scope have changed.
+   */
+  public hasChanges(fields: string[]): boolean {
+    for (let key of fields) {
+      let child = this._children[key];
+      if (child && !child.changed) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -291,6 +344,22 @@ export class ListScopeContext extends BaseContext {
    */
   public get value() {
     return this._children.map(getChildScopeValue);
+  }
+
+  /**
+   * Returns the errors for all of the scopes within this list scope as an array or
+   * null if no errors are found in any of the nested scopes.
+   */
+  public get error(): null | ErrorMap[] {
+    let output: ErrorMap[] = [];
+    for (let child of this._children) {
+      let error = child.error;
+      if (error) {
+        output.push(error);
+      }
+    }
+
+    return (output.length > 0 ? output : null);
   }
 
   /**

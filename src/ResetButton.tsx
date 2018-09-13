@@ -14,7 +14,7 @@ export type ResetButtonProps =
 export class ResetButton extends React.PureComponent<ResetButtonProps> {
 
   static defaultProps: Partial<ResetButtonProps> = {
-    disabledOnError: true,
+    disabledOnError: false,
     disabledUntilChanged: true,
   };
 
