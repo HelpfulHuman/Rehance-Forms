@@ -13,8 +13,7 @@
     "watch": "npm run build -- --watch",
     "test": "echo 'No tests available yet';",
     "tdd": "npm run watch | npm run test -- --watch",
-    "prepublish": "npm run clean && npm run build && npm run test",
-    "postpublish": "git push origin master && git push origin master --tags"
+    "prepublish": "npm run clean && npm run build && npm run test"
   },
   "dependencies": {
     "events": "^3.0.0",
