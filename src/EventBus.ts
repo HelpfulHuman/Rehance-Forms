@@ -10,7 +10,9 @@ export type EventBusSubscriber = (ev: FormEvent) => void;
 export enum FormEventSignal {
   SubmitForm,
   ScopeUpdate,
+  FieldCreated,
   FieldUpdate,
+  FieldDestroyed,
 }
 
 export type FormEvent = {

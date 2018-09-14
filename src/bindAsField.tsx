@@ -45,6 +45,7 @@ export function bindAsField<ChildProps extends object = {}>(
     public componentWillMount() {
       const scope: ScopeContext = this.props.formScope;
       this.fieldState = scope.field(this.props.name);
+      scope.broadcast(FormEventSignal.FieldCreated, this.props.name);
       this.unsubscribe = scope.listen(this.handleScopeEvents);
     }
 
@@ -54,6 +55,7 @@ export function bindAsField<ChildProps extends object = {}>(
     public componentWillUnmount() {
       this.props.formScope.clearChild(this.props.name);
       this.unsubscribe();
+      this.props.formScope.broadcast(FormEventSignal.FieldDestroyed, this.props.name);
     }
 
     /**

@@ -47,6 +47,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
    */
   public componentWillMount() {
     this.field = this.props.formScope.field(this.props.name);
+    this.props.formScope.broadcast(FormEventSignal.FieldCreated, this.props.name);
     this.unsubscribe = this.props.formScope.listen(this.handleScopeEvent);
   }
 
@@ -56,6 +57,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   public componentWillUnmount() {
     this.unsubscribe();
     this.props.formScope.clearChild(this.props.name);
+    this.props.formScope.broadcast(FormEventSignal.FieldDestroyed, this.props.name);
   }
 
   /**
