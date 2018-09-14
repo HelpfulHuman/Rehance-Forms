@@ -199,7 +199,7 @@ export class ScopeContext extends BaseContext implements IScopeChild {
    */
   public field(name: string): FieldContext {
     if (!this._children[name]) {
-      let initialValue = this.initialValues[name] || null;
+      let initialValue = this.initialValues[name];
       this._children[name] = new FieldContext(initialValue);
     }
 
@@ -287,8 +287,8 @@ export class ScopeContext extends BaseContext implements IScopeChild {
   /**
    * Convenience method for getting a single value from the scope.
    */
-  public get(field: string, fallback: any = null) {
-    return (this._children[field] ? this._children[field].value : fallback);
+  public get(field: string, fallback: any = undefined) {
+    return (this._children[field] !== undefined ? this._children[field].value : fallback);
   }
 
 }
