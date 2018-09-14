@@ -13,6 +13,8 @@ export class FieldContext implements IScopeChild {
 
     if (initialValue && typeof initialValue === "object") {
       this.value = (Array.isArray(initialValue) ? initialValue.slice(0) : { ...initialValue });
+    } else {
+      this.value = this._initialValue;
     }
   }
 
