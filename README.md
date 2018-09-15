@@ -97,27 +97,23 @@ type Valdiator = (field: string, formValues: object) => string | null;
 
 #### Value Formatting
 
-By default, the value type for `Input`, `TextArea` and `Select` is a `string`. However, you can choose to format this value to whatever you want. A `format` function can be provided that will be passed the current value input/output for the component.
+By default, the value type passed to and from `Input`, `TextArea` and `Select` typically gets coerced to a `string` (since this is what the underlying HTML element does). However, you can choose to format this value to whatever you want using a `format` function prop. You could use this feature to create things such as form field masks.
 
 ```ts
-type Formatter =
-  | (input: any, output: null) => string
-  | (input: null, output: string) => any
+type Formatter = (value: any, isOutput: boolean) => any;
 ```
 
-An important thing to consider here is that an incoming input value must always be coercible to a `string` (since that's the required format for `<input>`, `<textarea>` and `<select>`).
-
-Let's say you need to format a text field into and out of an object. An example of a proper format implementation for this use case would be:
+Here's an example of how you might convert an object to a string input and vice versa. In this scenario, we want the data stored as an object `{custom: ""}` where the field is used to display and edit the `custom` key's value.
 
 ```ts
-function formatToObject(input, output) {
-  if (output !== null) {
-    return { custom: output };
-  } else {
-    return input ? input.custom : "";
-  }
+function formatToObject(value, output) {
+  return output ? { custom: value } : value.custom;
 }
+
+<Input name="someObjectField" format={formatToObject} />;
 ```
+
+> **Note:** If you wish to edit many fields of an object within your form, it may be preferable to use a `<Scope>` instead. [You can find more information about the `<Scope>` component below.](#Scope)
 
 #### Customizations
 

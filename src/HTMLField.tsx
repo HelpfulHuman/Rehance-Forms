@@ -5,7 +5,7 @@ import { WithFormScopeProps } from "./helpers";
 import { FormEventSignal, FormEvent } from "./EventBus";
 
 export interface Formatter {
-  (input: any | null, output: string | null): any;
+  (value: any, output: boolean): any;
 }
 
 export type GetClassName = (field: FieldContext) => string;
@@ -64,7 +64,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
    * Returns the formatted value for the field.
    */
   protected get value(): string {
-    return this.format(this.field.value, null);
+    return this.format(this.field.value, false);
   }
 
   /**
@@ -83,11 +83,12 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   /**
    * Format input using a given formatter prop.
    */
-  protected format(input: any, output: string | null): any {
-    if (!this.props.format) {
-      return (output || input);
-    }
-    return this.props.format(input, output);
+  protected format(value: any, output: boolean): any {
+    return (
+      this.props.format ?
+        this.props.format(value, output) :
+        value
+    );
   }
 
   /**
@@ -141,7 +142,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
    * Handle change events for this field.
    */
   protected handleChange(ev: React.ChangeEvent<ElementType>) {
-    const value = this.format(null, ev.target.value);
+    const value = this.format(ev.target.value, true);
 
     if (this.props.validateOnChange) {
       this.field.error = this.validateSelf();
