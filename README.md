@@ -57,6 +57,14 @@ The most critical component out of this list, the `Form` component sets up and p
 <Form onSubmit={values => console.log(values)} />
 ```
 
+You can optionally supply an `initialValues` prop with an object containing the default values for all the fields of the form. This initial value is not only used to propogate the default values for each form field but also for determining what fields have changed from their initial value.
+
+```tsx
+<Form initialValues={{ message: "Hello World" }}>
+  <Input name="message" />
+</Form>
+```
+
 ### `<Input>` and `<TextArea>`
 
 The `<Input>` and `<TextArea>` components are direct abstractions over the standard `<input>` and `<textarea>` elements. They support nearly all of the standard props for their base elements, with a few exceptions. They automatically handle state management for input value and error states.

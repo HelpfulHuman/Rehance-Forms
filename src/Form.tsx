@@ -25,7 +25,18 @@ export class Form extends React.Component<FormProps> {
 
   constructor(props: FormProps, context: any) {
     super(props, context);
-    this.formScope = new ScopeContext({ ...props.initialValues });
+
+    let initialValues = {};
+    if (
+      typeof props.initialValues !== "object" ||
+      Array.isArray(props.initialValues)
+    ) {
+      console.warn("You must provide an object type for the initialValues prop!  Reverting to an empty object.");
+    } else {
+      let initialValues = { ...props.initialValues };
+    }
+
+    this.formScope = new ScopeContext(initialValues);
     this.formScope.listen(this.handleScopeEvent);
   }
 
