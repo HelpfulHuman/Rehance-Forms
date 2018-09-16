@@ -33,7 +33,7 @@ export class Form extends React.Component<FormProps> {
     ) {
       console.warn("You must provide an object type for the initialValues prop!  Reverting to an empty object.");
     } else {
-      let initialValues = { ...props.initialValues };
+      initialValues = { ...props.initialValues };
     }
 
     this.formScope = new ScopeContext(initialValues);
