@@ -10,6 +10,7 @@ export type FormProps = {
   style?: React.CSSProperties;
   initialValues?: FieldMap;
   tag?: string;
+  onEvent?(ev: FormEvent, scope: ScopeContext): void;
   onSubmit?(values: FieldMap, scope: ScopeContext): void;
   children?: React.ReactNode | RenderProp;
 };
@@ -47,6 +48,8 @@ export class Form extends React.Component<FormProps> {
   private handleScopeEvent = (ev: FormEvent) => {
     if (ev.signal === FormEventSignal.SubmitForm) {
       this.handleSubmit();
+    } else if (this.props.onEvent) {
+      this.props.onEvent(ev, this.formScope);
     }
   };
 
