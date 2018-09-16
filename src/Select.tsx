@@ -12,7 +12,7 @@ export type SelectProps =
   & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "className" | "value" | "form">
   & FieldProps<HTMLSelectElement>
   & {
-    options?: SelectOption[];
+    options?: (string | SelectOption)[];
   };
 
 class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
@@ -38,7 +38,11 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
   /**
    * Render a single option element.
    */
-  protected renderOption = (option: SelectOption, idx: number) => {
+  protected renderOption = (option: string | SelectOption, idx: number) => {
+    if (typeof option === "string") {
+      option = { value: option, label: option };
+    }
+
     return (
       <option key={idx} value={option.value}>
         {option.label}

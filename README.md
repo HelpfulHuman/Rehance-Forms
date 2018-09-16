@@ -136,11 +136,11 @@ The `<Input>` and `<TextArea>` components are simple wrappers around the default
 
 ### `<Select>`
 
-The `<Select>` component is a direct abstraction of the standard `<select>` _and_ `<option>` elements. Rather than requiring the `<option>` children be provided manually, an `options` prop can be provided containing an array of `{ value: string, label: string }` objects for each option to be rendered.
+The `<Select>` component is a direct abstraction of the standard `<select>` _and_ `<option>` elements. Rather than requiring the `<option>` children be provided manually, an `options` prop can be provided containing an array of `string` values or using `{ value: string, label: string }` objects for each option to be rendered.
 
 Validation handling for `<Select>` is identical to [validation handling for `<Input>` and `<TextArea>`](#validation-basics), as well as, [adding custom formatting](#value-formatting).
 
-Both of the following approaches work with the `<Select>` component.
+The following approaches work with the `<Select>` component.
 
 ```tsx
 // standard approach to <select>
@@ -150,7 +150,13 @@ Both of the following approaches work with the `<Select>` component.
   <option value="blue">Blue</option>
 </Select>
 
-// alternate approach
+// alternate approach 1
+<Select
+  name="favColor"
+  options={["Red", "Green", "Blue"]}
+/>
+
+// alternate approach 2
 <Select
   name="favColor"
   options={[
@@ -160,6 +166,8 @@ Both of the following approaches work with the `<Select>` component.
   ]}
 />
 ```
+
+> **Note:** Providing an array of `string` values via the `options` prop will result in the `<option>` tags using the value for both the value and label of the option.
 
 ### `<Toggle>`
 
