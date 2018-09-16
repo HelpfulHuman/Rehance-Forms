@@ -205,7 +205,7 @@ export class ScopeContext extends BaseContext implements IScopeChild {
 
     if (!(this._children[name] instanceof FieldContext)) {
       console.warn(`"${name} is not a FieldContext type child of scope! Returning an empty FieldContext object instead.`);
-      return new FieldContext(this.initialValues[name] || null);
+      return new FieldContext(this.initialValues[name]);
     }
 
     return this._children[name] as FieldContext;
