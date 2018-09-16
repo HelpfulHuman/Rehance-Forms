@@ -8,6 +8,7 @@ import { InputWithErrors } from "./forms/InputWithErrors";
 import { ValidateOnChange } from "./forms/ValidationOnChange";
 import { VariousControls } from "./forms/VariousControls";
 import { Scopes } from "Rehance-Forms/example/src/forms/Scopes";
+import { EditFormWithScopes } from "Rehance-Forms/example/src/forms/EditFormWithScopes";
 
 render(
   <div>
@@ -19,6 +20,7 @@ render(
     <VariousControls />
     <LoginForm />
     <Scopes />
+    <EditFormWithScopes />
   </div>
   , document.getElementById("root")
 );
