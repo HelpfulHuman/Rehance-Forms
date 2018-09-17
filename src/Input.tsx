@@ -37,7 +37,8 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
 
     const isCheckable = this.props.type === "checkbox" || this.props.type === "radio";
     const currentValue = this.value;
-    const value = (isCheckable ? checkedValue : currentValue);
+    const currentValueSafe = (currentValue !== null && currentValue !== undefined ? "" + currentValue : "");
+    const value = (isCheckable ? checkedValue : currentValueSafe);
     const checked = (isCheckable && ("" + checkedValue) === ("" + currentValue));
     const onChange = (isCheckable ? this.handleCheckbox : this.handleChange);
 
@@ -46,7 +47,7 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
         {...props}
         className={this.classes}
         ref={this.bindRef}
-        value={value !== null ? value : ""}
+        value={value !== null && value !== undefined ? "" + value : ""}
         onBlur={this.handleBlur}
         onChange={onChange}
         checked={checked}

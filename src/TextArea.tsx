@@ -23,7 +23,7 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
         {...props}
         className={this.classes}
         ref={this.bindRef}
-        value={value !== null ? value : ""}
+        value={value !== null && value !== undefined ? "" + value : ""}
         onBlur={this.handleBlur}
         onChange={this.handleChange}
       />
