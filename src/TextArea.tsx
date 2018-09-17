@@ -16,13 +16,14 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
    */
   public render() {
     const { formScope, validate, validateOnChange, format, className, ...props } = this.props;
+    const value = this.value;
 
     return (
       <textarea
         {...props}
         className={this.classes}
         ref={this.bindRef}
-        value={this.value || ""}
+        value={value !== null ? value : ""}
         onBlur={this.handleBlur}
         onChange={this.handleChange}
       />
