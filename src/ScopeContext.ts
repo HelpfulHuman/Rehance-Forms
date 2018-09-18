@@ -300,13 +300,13 @@ function getChildScopeValue(scope: ScopeContext) {
 
 export class ListScopeContext extends BaseContext {
 
-  protected _children: ScopeContext[] = [];
+  public children: ScopeContext[] = [];
   protected _initialValues: FieldMap[];
 
   constructor(initialValues: FieldMap[] = [], parentScope: null | BaseContext = null) {
     super(parentScope);
     this._initialValues = initialValues;
-    this._children = initialValues.map(value => new ScopeContext(value, this));
+    this.children = initialValues.map(value => new ScopeContext(value, this));
   }
 
   /**
@@ -317,32 +317,25 @@ export class ListScopeContext extends BaseContext {
   }
 
   /**
-   * Returns the array of children.
-   */
-  public get children() {
-    return this._children;
-  }
-
-  /**
    * Adds a new child context to the list scope.
    */
   public addChildScope(values: FieldMap) {
-    this._children.push(new ScopeContext(values, this));
+    this.children.push(new ScopeContext(values, this));
   }
 
   /**
    * Splices a specific child by index.
    */
   public removeChildScope(index: number) {
-    if (index < 0 || index >= this._children.length) { return; }
-    this._children.splice(index, 1);
+    if (index < 0 || index >= this.children.length) { return; }
+    this.children.splice(index, 1);
   }
 
   /**
    * Slices the child scope array.
    */
   public sliceChildScopes(start?: number, end?: number) {
-    this._children = this._children.slice(start, end);
+    this.children = this.children.slice(start, end);
   }
 
   /**
@@ -350,7 +343,7 @@ export class ListScopeContext extends BaseContext {
    * and the child scopes.
    */
   public get value() {
-    return this._children.map(getChildScopeValue);
+    return this.children.map(getChildScopeValue);
   }
 
   /**
@@ -359,7 +352,7 @@ export class ListScopeContext extends BaseContext {
    */
   public get error(): null | ErrorMap[] {
     let output: ErrorMap[] = [];
-    for (let child of this._children) {
+    for (let child of this.children) {
       let error = child.error;
       if (error) {
         output.push(error);
@@ -373,7 +366,7 @@ export class ListScopeContext extends BaseContext {
    * Returns true if none of the fields in the current scope have an error.
    */
   public get valid(): boolean {
-    for (let child of this._children) {
+    for (let child of this.children) {
       if (!child.valid) {
         return false;
       }
@@ -386,7 +379,7 @@ export class ListScopeContext extends BaseContext {
    * Returns true if any of the fields have in the current scope have changed.
    */
   public get changed(): boolean {
-    for (let child of this._children) {
+    for (let child of this.children) {
       if (child.changed) {
         return true;
       }
@@ -400,7 +393,7 @@ export class ListScopeContext extends BaseContext {
    * back to their initial values.
    */
   public reset() {
-    for (let child of this._children) {
+    for (let child of this.children) {
       child.reset();
     }
   }
@@ -409,7 +402,7 @@ export class ListScopeContext extends BaseContext {
    * Clears the values of all fields and scopes within the current scope.
    */
   public clear() {
-    for (let child of this._children) {
+    for (let child of this.children) {
       child.clear();
     }
   }
