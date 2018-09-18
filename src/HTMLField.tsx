@@ -3,6 +3,7 @@ import { FieldMap } from "./types";
 import { FieldContext } from "./FieldContext";
 import { WithFormScopeProps } from "./helpers";
 import { FormEventSignal, FormEvent } from "./EventBus";
+import { ScopeContext } from "./ScopeContext";
 
 export interface Formatter {
   (value: any, output: boolean): any;
@@ -16,8 +17,9 @@ export type FieldProps<ElementType> = {
   validateOnChange?: boolean;
   format?: Formatter;
   validate?(field: string, values: FieldMap): string | null;
-  onChange?(ev: React.ChangeEvent<ElementType>): void;
-  onBlur?(ev: React.FocusEvent<ElementType>): void;
+  onFocus?(ev: React.FocusEvent<ElementType>, scope: ScopeContext): void;
+  onChange?(ev: React.ChangeEvent<ElementType>, scope: ScopeContext): void;
+  onBlur?(ev: React.FocusEvent<ElementType>, scope: ScopeContext): void;
 };
 
 export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, ElementType extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, State = {}>
@@ -37,6 +39,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
     // this is to make sure we don't break inheritance
     this.bindRef = this.bindRef.bind(this);
     this.handleScopeEvent = this.handleScopeEvent.bind(this);
+    this.handleFocus = this.handleFocus.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.validateSelf = this.validateSelf.bind(this);
@@ -126,6 +129,15 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
   }
 
   /**
+   * Handle focus events for this field.
+   */
+  protected handleFocus(ev: React.FocusEvent<ElementType>) {
+    if (this.props.onFocus) {
+      this.props.onFocus(ev, this.props.formScope);
+    }
+  }
+
+  /**
    * Handle blur events for this field.
    */
   protected handleBlur(ev: React.FocusEvent<ElementType>) {
@@ -134,7 +146,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
     this.triggerUpdate();
 
     if (this.props.onBlur) {
-      this.props.onBlur(ev);
+      this.props.onBlur(ev, this.props.formScope);
     }
   }
 
@@ -151,7 +163,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
     this.triggerUpdate();
 
     if (this.props.onChange) {
-      this.props.onChange(ev);
+      this.props.onChange(ev, this.props.formScope);
     }
   }
 
