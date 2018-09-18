@@ -9,7 +9,7 @@ export type SelectOption = {
 };
 
 export type SelectProps =
-  & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "className" | "value" | "form">
+  & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "className" | "value" | "form" | "onChange" | "onBlur" | "onFocus">
   & FieldProps<HTMLSelectElement>
   & {
     options?: (string | SelectOption)[];
@@ -63,6 +63,7 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
         ref={this.bindRef}
         value={this.value || ""}
         onBlur={this.handleBlur}
+        onFocus={this.handleFocus}
         onChange={this.handleChange}
       >
         {Array.isArray(options) ? options.map(this.renderOption) : children}

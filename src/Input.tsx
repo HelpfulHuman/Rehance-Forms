@@ -4,7 +4,7 @@ import { Omit } from "./types";
 import { HTMLFieldComponent, FieldProps } from "./HTMLField";
 
 export type InputProps =
-  & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className" | "value" | "checked" | "form">
+  & Omit<React.InputHTMLAttributes<HTMLInputElement>, "className" | "value" | "checked" | "form" | "onChange" | "onBlur" | "onFocus">
   & FieldProps<HTMLInputElement>
   & { checkedValue?: any };
 
@@ -49,6 +49,7 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
         ref={this.bindRef}
         value={value !== null && value !== undefined ? "" + value : ""}
         onBlur={this.handleBlur}
+        onFocus={this.handleFocus}
         onChange={onChange}
         checked={checked}
       />

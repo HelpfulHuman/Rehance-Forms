@@ -4,7 +4,7 @@ import { HTMLFieldComponent, FieldProps } from "./HTMLField";
 import { withFormScope } from "./helpers";
 
 export type TextAreaProps =
-  & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "className" | "value" | "form">
+  & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "className" | "value" | "form" | "onChange" | "onBlur" | "onFocus">
   & FieldProps<HTMLTextAreaElement>;
 
 export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTextAreaElement> {
@@ -25,6 +25,7 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
         ref={this.bindRef}
         value={value !== null && value !== undefined ? "" + value : ""}
         onBlur={this.handleBlur}
+        onFocus={this.handleFocus}
         onChange={this.handleChange}
       />
     );
