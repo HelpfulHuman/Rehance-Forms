@@ -339,6 +339,13 @@ export class ListScopeContext extends BaseContext {
   }
 
   /**
+   * Slices the child scope array.
+   */
+  public sliceChildScopes(start?: number, end?: number) {
+    this._children = this._children.slice(start, end);
+  }
+
+  /**
    * Builds and returns an array with the data managed by this scope,
    * and the child scopes.
    */
