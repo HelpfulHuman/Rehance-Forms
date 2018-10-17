@@ -410,7 +410,7 @@ The `<CollectionScope>` component is for creating a complex array of scopes for 
 ```tsx
 <Form initialValues={{ people: [] }}>
   <CollectionScope name="people">
-    {({ index, scope, remove }) => (
+    {({ index, total, scope, remove }) => (
       <div>
         <h4>Person #{index}</h4>
         <Input name="firstName" />

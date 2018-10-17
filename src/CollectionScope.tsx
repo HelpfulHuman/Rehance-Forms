@@ -5,6 +5,7 @@ import { ListScopeContext, ScopeContext, FormScopeProvider } from "./ScopeContex
 
 export type CollectionScopeItemChildrenProps = {
   index: number;
+  total: number;
   scope: ScopeContext;
   removeItem(): void;
 };
@@ -82,6 +83,7 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
         {this.props.children({
           index: idx,
           scope: scope,
+          total: this.scope.children.length,
           removeItem: () => this.handleItemRemoval(idx),
         })}
       </FormScopeProvider>
