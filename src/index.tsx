@@ -4,6 +4,7 @@ export * from "./Button";
 export * from "./ClearButton";
 export { CollectionScope, CollectionScopeProps, CollectionScopeItemChildrenProps } from "./CollectionScope";
 export * from "./ErrorOutput";
+export * from "./EventBus";
 export * from "./Form";
 export * from "./helpers";
 export { Formatter, GetClassName } from "./HTMLField";
