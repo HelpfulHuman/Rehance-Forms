@@ -7,7 +7,7 @@ export * from "./ErrorOutput";
 export * from "./EventBus";
 export * from "./Form";
 export * from "./helpers";
-export { Formatter, GetClassName } from "./HTMLField";
+export * from "./HTMLField";
 export * from "./Input";
 export * from "./PreviewOutput";
 export * from "./ResetButton";
