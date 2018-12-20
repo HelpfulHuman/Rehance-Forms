@@ -16,6 +16,7 @@ export type FieldProps<ElementType> = {
   className?: string | GetClassName;
   validateOnChange?: boolean;
   format?: Formatter;
+  keepChangesOnUnmount?: boolean;
   validate?(field: string, values: FieldMap): string | null;
   onFocus?(ev: React.FocusEvent<ElementType>, scope: ScopeContext): void;
   onChange?(ev: React.ChangeEvent<ElementType>, scope: ScopeContext): void;
@@ -59,7 +60,9 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
    */
   public componentWillUnmount() {
     this.unsubscribe();
-    this.props.formScope.clearChild(this.props.name);
+    if (this.props.keepChangesOnUnmount) {
+      this.props.formScope.clearChild(this.props.name);
+    }
     this.props.formScope.broadcast(FormEventSignal.FieldDestroyed, this.props.name);
   }
 

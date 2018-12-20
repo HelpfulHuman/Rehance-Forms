@@ -10,6 +10,7 @@ export type FormProps = {
   style?: React.CSSProperties;
   initialValues?: FieldMap;
   tag?: string;
+  mergeInitialStateOnSubmit?: boolean;
   onEvent?(ev: FormEvent, scope: ScopeContext): void;
   onSubmit?(values: FieldMap, scope: ScopeContext): void;
   children?: React.ReactNode | RenderProp;
@@ -58,7 +59,8 @@ export class Form extends React.Component<FormProps> {
    */
   private handleSubmit = () => {
     if (this.props.onSubmit) {
-      this.props.onSubmit(this.formScope.value, this.formScope);
+      const values = (this.props.mergeInitialStateOnSubmit ? { ...this.props.initialValues, ...this.formScope.value } : this.formScope.value);
+      this.props.onSubmit(values, this.formScope);
     }
   }
 
@@ -90,7 +92,7 @@ export class Form extends React.Component<FormProps> {
         <FormScopeProvider value={this.formScope}>
           {
             typeof this.props.children === "function" ?
-              this.props.children(this.formScope) :
+              (this.props.children as RenderProp)(this.formScope) :
               this.props.children
           }
         </FormScopeProvider>

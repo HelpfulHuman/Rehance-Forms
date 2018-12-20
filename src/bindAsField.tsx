@@ -16,6 +16,7 @@ export type WithFieldProps<ChildProps> = ChildProps & {
 
 export type CustomFieldProps<ChildProps> = ChildProps & {
   name: string;
+  keepChangesOnUnmount?: boolean;
 };
 
 export type FieldState = {
@@ -53,7 +54,9 @@ export function bindAsField<ChildProps extends object = {}>(
      * Unregister the field from the parent scope and unsubscribe from scope events.
      */
     public componentWillUnmount() {
-      this.props.formScope.clearChild(this.props.name);
+      if (this.props.keepChangesOnUnmount) {
+        this.props.formScope.clearChild(this.props.name);
+      }
       this.unsubscribe();
       this.props.formScope.broadcast(FormEventSignal.FieldDestroyed, this.props.name);
     }
