@@ -104,7 +104,7 @@ export class _Radio extends React.Component<WithFieldProps<RadioProps>> {
 
     return (
       typeof this.props.children === "function" ?
-        this.props.children(fieldProps) :
+        (this.props.children as any)(fieldProps) :
         this.renderRadio(fieldProps)
     );
   }
