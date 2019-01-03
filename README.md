@@ -4,6 +4,8 @@ This library aims to ease the pain of creating forms in React. It offers automat
 
 **This library is written using [Typescript](http://www.typescriptlang.org/) and offers full typing support.**
 
+> **NOTE:** Though inline fat arrow functions are used throughout this script, we recommend you hard-bind class methods instead.
+
 ## Getting Started
 
 Install via `npm`:
