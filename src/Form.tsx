@@ -11,6 +11,7 @@ export type FormProps = {
   initialValues?: FieldMap;
   tag?: string;
   mergeInitialStateOnSubmit?: boolean;
+  onMount?(scope: ScopeContext): void;
   onEvent?(ev: FormEvent, scope: ScopeContext): void;
   onSubmit?(values: FieldMap, scope: ScopeContext): void;
   children?: React.ReactNode | RenderProp;
@@ -43,6 +44,15 @@ export class Form extends React.Component<FormProps> {
   }
 
   /**
+   * Provide the "onMount" prop (if any) with the form scope object for the form.
+   */
+  public componentDidMount() {
+    if (this.props.onMount) {
+      this.props.onMount(this.formScope);
+    }
+  }
+
+  /**
    * Handle scope updates for the the top level scope created by this component,
    * including the call to submit the form.
    */
@@ -52,7 +62,7 @@ export class Form extends React.Component<FormProps> {
     } else if (this.props.onEvent) {
       this.props.onEvent(ev, this.formScope);
     }
-  };
+  }
 
   /**
    * The actual function that handles that calls the submit handler prop.
