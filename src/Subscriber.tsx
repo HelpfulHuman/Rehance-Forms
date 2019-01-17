@@ -8,7 +8,7 @@ export type SubscriberProps = {
   children(scope: ScopeContext): React.ReactNode;
 };
 
-class _Subscriber extends React.PureComponent<WithFormScopeProps<SubscriberProps>> {
+class _Subscriber extends React.Component<WithFormScopeProps<SubscriberProps>> {
 
   static displayName = "Subscriber";
 

@@ -37,6 +37,7 @@ export abstract class BaseContext implements IScopeChild {
    * Essentially, this will return the form scope.
    */
   public get root(): BaseContext {
+    // tslint:disable-next-line:no-this-assignment
     let scope: BaseContext = this;
     while (scope.parent) {
       scope = scope.parent;
