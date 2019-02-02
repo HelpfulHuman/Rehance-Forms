@@ -20,11 +20,17 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
    * Handle changes to the element for radios and checkboxes.
    */
   private handleCheckbox = (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const { type, checkedValue } = this.props;
+    const value = (
+      type === "checkbox" && this.field.value === checkedValue ?
+        null : checkedValue
+    );
+
     this.handleChange({
       ...ev,
       target: {
         ...ev.target,
-        value: this.props.checkedValue,
+        value,
       },
     });
   }
