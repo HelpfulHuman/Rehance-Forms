@@ -11,14 +11,13 @@ export type MultiSelectProps = {
   value: any;
   onChange?(value: boolean): void;
   children?: React.ReactNode | RenderMultiSelect;
-  deselectOthers?: boolean;
-  deselectIfSelected?: any[];
+  replaceAllWhenAdded?: boolean;
   disallowDeselect?: boolean;
 };
 
 export type RenderMultiSelectProps = {
   value: any;
-  groupValue: any;
+  fieldValue: any;
   selected: boolean;
   disabled: boolean;
   toggle(): void;
@@ -30,7 +29,6 @@ export class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProp
     className: "MultiSelect",
     activeClassName: "isActive",
     disabledClassName: "isDisabled",
-    deselectIfSelected: [],
   };
 
   /**
@@ -44,8 +42,8 @@ export class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProp
       return field.value.slice(0);
     }
 
-    if (field.value) {
-      console.warn(`MultiSelect values are intended to be arrays, check the value provided to ${name} to ensure that it's an array.`);
+    if (!!field.value) {
+      console.warn(`MultiSelect values are intended to be arrays, check the value provided to "${name}" to ensure that it's an array.`);
       return [field.value];
     }
 
@@ -56,15 +54,10 @@ export class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProp
    * Toggle the MultiSelect state between the set prop value and a null state.
    */
   private handleToggle = () => {
-    const { field, value, disabled, deselectOthers: uncheckOthers, disallowDeselect } = this.props;
+    const { field, value, disabled, replaceAllWhenAdded, disallowDeselect } = this.props;
     let values = this.getFieldValues();
 
     if (disabled) { return; }
-
-    if (uncheckOthers) {
-      field.update({ value: [] });
-      return;
-    }
 
     const idx = values.indexOf(value);
     if (idx !== -1) {
@@ -76,7 +69,7 @@ export class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProp
 
     } else {
 
-      values = (uncheckOthers ? [value] : values.concat(value));
+      values = (replaceAllWhenAdded ? [value] : values.concat(value));
       field.update({ value: values });
 
     }
@@ -103,12 +96,13 @@ export class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProp
    * Render the MultiSelect component.
    */
   render() {
-    const { disabled, field, value } = this.props;
+    const { disabled, value } = this.props;
+    const fieldValue = this.getFieldValues();
     const fieldProps: RenderMultiSelectProps = {
       disabled: !!disabled,
-      groupValue: field.value,
+      fieldValue: fieldValue,
       value: value,
-      selected: value === field.value,
+      selected: fieldValue.indexOf(value) !== -1,
       toggle: this.handleToggle,
     };
 

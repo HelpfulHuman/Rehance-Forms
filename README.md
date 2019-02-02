@@ -257,6 +257,45 @@ Using a child render prop, custom markup can be supplied in the function and wil
 </Radio>
 ```
 
+### `<MultiSelect>`
+
+The `<MultiSelect>` component is useful for creating toggles and checkboxes whose values should be added, or removed, from an array.  It operates in an extremely similar fashion to `<Toggle>` and `<Radio>`, but the value outputted will be an array with the selections.  This component can be used in 2 different ways. Both approaches support the `disabled` prop, an `onChange` event prop (for external change effects) and requires `name` and `value` props to be provided.
+
+#### Customize `MultiSelect` With CSS
+
+The first approach will create a single `<span>` element and apply the base `className`, along with, the appropriate classes for active and disabled states.
+
+```tsx
+// the classes used here are the default classes provided by the component
+<MultiSelect
+  name="colors"
+  value="green"
+  className="MultiSelect"
+  activeClassName="isActive"
+  disabledClassName="isDisabled"
+  onChange={state => alert(state)}
+>
+  Green
+</MultiSelect>
+```
+
+#### Completely Custom `MultiSelect` Markup
+
+Using a child render prop, custom markup can be supplied in the function and will be provided with the component's value, the current `groupValue`, the component's `disabled` state and 2 field mutation methods: `select` and `deselect`. When using this approach, the `allowSelect` prop is _not_ taken into account.
+
+- `select()` will set the radio group's value to the component's set `value`.
+- `deselect()` will set the radio group's value `null`.
+
+```tsx
+<MultiSelect name="colors" value="green">
+  {({ groupValue, value, selected, disabled, toggle }) => (
+    <span onClick={toggle}>
+      {value} {selected ? "(Selected)" : ""}
+    </span>
+  )}
+</MultiSelect>
+```
+
 ### `<Subscriber>`
 
 The `<Subscriber>` component provides a quick and easy way to subscribe to specific field and form changes. It simply needs `field` prop for describing what fields should trigger a re-render. This `field` prop can be `string` containing the field name, an `array` of strings containing multiple field names or a function that determines whether it should update by returning a `boolean` value.
