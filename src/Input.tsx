@@ -24,8 +24,8 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
       ...ev,
       target: {
         ...ev.target,
-        value: this.props.checkedValue
-      }
+        value: this.props.checkedValue,
+      },
     });
   }
 
