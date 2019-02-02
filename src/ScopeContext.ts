@@ -322,7 +322,7 @@ export class ListScopeContext extends BaseContext {
    * Adds a new child context to the list scope.
    */
   public addChildScope(values: FieldMap) {
-    this.children.push(new ScopeContext(values, this));
+    this.children.push(new ScopeContext({}, this));
   }
 
   /**
@@ -374,6 +374,10 @@ export class ListScopeContext extends BaseContext {
    * Returns true if any of the fields have in the current scope have changed.
    */
   public get changed(): boolean {
+    if (this.children.length !== this._initialValues.length) {
+      return true;
+    }
+
     for (let child of this.children) {
       if (child.changed) {
         return true;
