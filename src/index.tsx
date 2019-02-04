@@ -9,6 +9,7 @@ export * from "./Form";
 export * from "./helpers";
 export * from "./HTMLField";
 export * from "./Input";
+export { MultiSelect, MultiSelectProps, RenderMultiSelectProps } from "./MultiSelect";
 export * from "./PreviewOutput";
 export * from "./ResetButton";
 export * from "./ScopeContext";
