@@ -107,6 +107,7 @@ export abstract class BaseContext implements IScopeChild {
     this.broadcast(FormEventSignal.SubmitForm);
   }
 
+  abstract readonly touched: boolean;
   abstract readonly value: any;
   abstract readonly valid: boolean;
   abstract readonly changed: boolean;
@@ -253,6 +254,19 @@ export class ScopeContext extends BaseContext implements IScopeChild {
   }
 
   /**
+   * Returns true if any of the fields have in the current scope have been touched.
+   */
+  public get touched(): boolean {
+    for (let key in this.children) {
+      if (this.children[key].touched) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Returns true if any of the specified children of this scope have changed.
    */
   public hasChanges(fields: string[]): boolean {
@@ -380,6 +394,19 @@ export class ListScopeContext extends BaseContext {
 
     for (let child of this.children) {
       if (child.changed) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Returns true if any of the fields have in the current scope have been touched.
+   */
+  public get touched(): boolean {
+    for (let key in this.children) {
+      if (this.children[key].touched) {
         return true;
       }
     }
