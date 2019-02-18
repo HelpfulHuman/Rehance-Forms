@@ -4,6 +4,7 @@ import { ScopeContext, FormScopeProvider } from "./ScopeContext";
 
 export type ScopeProps = {
   name: string;
+  children?: React.ReactNode;
 };
 
 export class _Scope extends React.PureComponent<WithFormScopeProps<ScopeProps>> {
