@@ -11,7 +11,7 @@ export type WithFormScopeProps<ChildProps> = ChildProps & {
  * that provides access to the form scope context API.
  */
 export function withFormScope<ChildProps extends object = {}>(Component: React.ComponentType<WithFormScopeProps<ChildProps>>) {
-  const Result = React.forwardRef<any, ChildProps>(function (props, ref) {
+  const Result = React.forwardRef<any, { children?: React.ReactNode } & ChildProps>(function (props, ref) {
     return (
       <FormScopeConsumer>
         {context => <Component {...props} formScope={context!} ref={ref!} />}
