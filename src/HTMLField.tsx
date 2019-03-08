@@ -60,7 +60,7 @@ export abstract class HTMLFieldComponent<Props extends FieldProps<ElementType>, 
    */
   public componentWillUnmount() {
     this.unsubscribe();
-    if (this.props.keepChangesOnUnmount) {
+    if (!this.props.keepChangesOnUnmount) {
       this.props.formScope.clearChild(this.props.name);
     }
     this.props.formScope.broadcast(FormEventSignal.FieldDestroyed, this.props.name);
