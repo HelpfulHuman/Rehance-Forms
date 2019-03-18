@@ -10,15 +10,19 @@ export type AddCollectionItemProps = {
   values?: FieldMap;
   className?: string;
   style?: React.CSSProperties;
+  disabled?: boolean | { (scope: ScopeContext): boolean };
 };
 
 export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCollectionItemProps>> {
 
   static displayName: string = "AddCollectionItem";
 
-  static defaultProps: Partial<AddCollectionItemProps> = {
-    values: {},
-  };
+  /**
+   * Checks if the component should be considered disabled or not.
+   */
+  private isDisabled() {
+    return (typeof this.props.disabled === "function" ? this.props.disabled(this.props.formScope) : this.props.disabled);
+  }
 
   /**
    * Handle the button click that will add a new item to the array item within
@@ -26,6 +30,9 @@ export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCo
    */
   private handleClick = (ev: React.MouseEvent<HTMLButtonElement>) => {
     ev.preventDefault();
+
+    if (this.props.disabled) { return; }
+
     let formScope: ScopeContext = this.props.formScope;
 
     let scopeChild = formScope.getChild(this.props.to);
@@ -60,6 +67,7 @@ export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCo
       <button
         style={this.props.style}
         className={this.props.className}
+        disabled={this.isDisabled()}
         onClick={this.handleClick}
       >
         {this.props.children}
