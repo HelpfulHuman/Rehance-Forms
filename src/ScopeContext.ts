@@ -335,8 +335,8 @@ export class ListScopeContext extends BaseContext {
   /**
    * Adds a new child context to the list scope.
    */
-  public addChildScope(values: FieldMap) {
-    this.children.push(new ScopeContext({}, this));
+  public addChildScope(values: FieldMap = {}) {
+    this.children.push(new ScopeContext(values, this));
   }
 
   /**
