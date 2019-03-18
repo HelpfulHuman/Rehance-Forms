@@ -2,6 +2,7 @@ import * as React from "react";
 import { WithFormScopeProps, withFormScope } from "./helpers";
 import { FormEvent, FormEventSignal } from "./EventBus";
 import { ListScopeContext, ScopeContext, FormScopeProvider } from "./ScopeContext";
+import { memoize } from "./utils";
 
 export type CollectionScopeItemChildrenProps = {
   index: number;
@@ -11,8 +12,14 @@ export type CollectionScopeItemChildrenProps = {
 };
 
 export type CollectionScopeProps = {
+  /** The field key that this collection scope will mount to. */
   name: string;
-  children(form: CollectionScopeItemChildrenProps): React.ReactNode;
+  /** Event that is triggered when an update is triggered realted to this collection scope (but not necessarily _by_ this collection scope. Called _after_ re-render and scope update. */
+  onChange?(scope: ListScopeContext): void;
+  /** Event that is triggered when an item is removed from the collection via the `removeItem` callback given to `children`.  Called _after_ re-render and scope update. */
+  onRemove?(index: number, scope: ListScopeContext): void;
+  /** Renders a form or view per item in this collection scope. */
+  children(itemScope: CollectionScopeItemChildrenProps): React.ReactNode;
 };
 
 /**
@@ -60,16 +67,22 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
     if ((!ev.field || ev.field === this.props.name) && isSameOrAncestorScope) {
       // this.keyOffset += 1;
       this.forceUpdate();
+      if (this.props.onChange) {
+        this.props.onChange(this.scope);
+      }
     }
   }
 
   /**
    * Handles the removal of a single item.
    */
-  private handleItemRemoval = (index: number) => {
+  private bindItemRemoval = memoize((index: number) => {
     this.scope.removeChildScope(index);
     this.scope.broadcast(FormEventSignal.FieldUpdate, this.props.name);
-  }
+    if (this.props.onRemove) {
+      this.props.onRemove(index, this.scope);
+    }
+  });
 
   /**
    * Renders a scoped form for each item in the array.
@@ -84,7 +97,7 @@ export class _CollectionScope extends React.Component<WithFormScopeProps<Collect
           index: idx,
           scope: scope,
           total: this.scope.children.length,
-          removeItem: () => this.handleItemRemoval(idx),
+          removeItem: this.bindItemRemoval(`remove_${idx}`, idx),
         })}
       </FormScopeProvider>
     );
