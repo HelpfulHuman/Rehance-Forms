@@ -11,6 +11,7 @@ export type AddCollectionItemProps = {
   className?: string;
   style?: React.CSSProperties;
   disabled?: boolean | { (scope: ScopeContext): boolean };
+  onClick?(ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext): void;
 };
 
 export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCollectionItemProps>> {
@@ -48,15 +49,18 @@ export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCo
         formScope.broadcast(FormEventSignal.FieldUpdate, this.props.to);
         return;
       }
-    }
-
-    if (scopeChild instanceof ListScopeContext) {
+    } else if (scopeChild instanceof ListScopeContext) {
       scopeChild.addChildScope(this.props.values!);
       formScope.broadcast(FormEventSignal.FieldUpdate, this.props.to);
       return;
+    } else {
+      console.warn(`AddCollectionItem cannot add an item to "${this.props.to}" because the target is not an array field or CollectionScope.`);
     }
 
-    console.warn(`AddCollectionItem cannot add an item to "${this.props.to}" because the target is not an array field or CollectionScope.`);
+    if (this.props.onClick) {
+      this.props.onClick(ev, formScope);
+    }
+
   }
 
   /**
