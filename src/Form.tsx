@@ -46,7 +46,7 @@ export class Form extends React.Component<FormProps> {
   /**
    * Provide the "onMount" prop (if any) with the form scope object for the form.
    */
-  public componentDidMount() {
+  public componentWillMount() {
     if (this.props.onMount) {
       this.props.onMount(this.formScope);
     }
