@@ -39,7 +39,7 @@ export class InputComponent extends HTMLFieldComponent<InputProps, HTMLInputElem
    * Render the component.
    */
   public render() {
-    let { formScope, validate, validateOnChange, format, className, checkedValue, ...props } = this.props;
+    let { formScope, validate, validateOnChange, format, className, checkedValue, keepChangesOnUnmount, ...props } = this.props;
 
     const isCheckable = this.props.type === "checkbox" || this.props.type === "radio";
     const currentValue = this.value;

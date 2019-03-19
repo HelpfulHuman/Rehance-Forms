@@ -54,7 +54,7 @@ class _Select extends HTMLFieldComponent<SelectProps, HTMLSelectElement> {
    * Renders the select element.
    */
   public render() {
-    const { formScope, validate, validateOnChange, className, options, children, ...props } = this.props;
+    const { formScope, validate, validateOnChange, className, options, children, keepChangesOnUnmount, ...props } = this.props;
 
     return (
       <select

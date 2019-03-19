@@ -15,7 +15,7 @@ export class TextAreaComponent extends HTMLFieldComponent<TextAreaProps, HTMLTex
    * Render the textarea component.
    */
   public render() {
-    const { formScope, validate, validateOnChange, format, className, ...props } = this.props;
+    const { formScope, validate, validateOnChange, format, className, keepChangesOnUnmount, ...props } = this.props;
     const value = this.value;
 
     return (
