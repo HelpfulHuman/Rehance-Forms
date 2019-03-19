@@ -32,7 +32,7 @@ export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCo
   private handleClick = (ev: React.MouseEvent<HTMLButtonElement>) => {
     ev.preventDefault();
 
-    if (this.props.disabled) { return; }
+    if (this.isDisabled()) { return; }
 
     let formScope: ScopeContext = this.props.formScope;
 
@@ -47,12 +47,10 @@ export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCo
       if (Array.isArray(arr)) {
         arr.push(this.props.values);
         formScope.broadcast(FormEventSignal.FieldUpdate, this.props.to);
-        return;
       }
     } else if (scopeChild instanceof ListScopeContext) {
       scopeChild.addChildScope(this.props.values!);
       formScope.broadcast(FormEventSignal.FieldUpdate, this.props.to);
-      return;
     } else {
       console.warn(`AddCollectionItem cannot add an item to "${this.props.to}" because the target is not an array field or CollectionScope.`);
     }
@@ -69,6 +67,7 @@ export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCo
   public render() {
     return (
       <button
+        type="button"
         style={this.props.style}
         className={this.props.className}
         disabled={this.isDisabled()}
