@@ -29,6 +29,16 @@ export class FieldContext implements IScopeChild {
    * Returns true if the value for the field has changed.
    */
   public get changed(): boolean {
+    let ot = typeof this._initialValue;
+
+    if (ot !== typeof this.value) {
+      return true;
+    }
+
+    if (ot === "object") {
+      return JSON.stringify(this._initialValue) !== JSON.stringify(this.value);
+    }
+
     return this._initialValue !== this.value;
   }
 
