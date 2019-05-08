@@ -6,29 +6,28 @@
   "jsnext:main": "dist/index.es.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "preversion": "npm test",
+    "preversion": "npm run clean && npm run build && npm run lint && npm run test",
     "version": "npm run build",
     "clean": "rm -rf dist/",
     "build": "rollup -c",
-    "watch": "npm run build -- --watch",
     "test": "echo 'No tests available yet';",
     "tdd": "npm run watch | npm run test -- --watch",
-    "prepare": "npm run clean && npm run build && npm run test",
     "lint": "tslint -p ."
   },
   "dependencies": {
     "events": "^3.0.0",
-    "react": "^16.8.2"
+    "react": "^16.8.2",
+    "rollup-plugin-typescript": "^1.0.1"
   },
   "devDependencies": {
     "@types/events": "^1.2.0",
     "@types/node": "^10.12.26",
     "@types/react": "^16.8.3",
+    "fast-deep-equal": "^2.0.1",
     "rollup": "^0.51.8",
     "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-typescript2": "^0.8.4",
-    "rollup-watch": "^4.3.1",
-    "typescript": "^3.3.3"
+    "tslib": "^1.9.3",
+    "typescript": "^3.4.5"
   },
   "repository": {
     "type": "git",

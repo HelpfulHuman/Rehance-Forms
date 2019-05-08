@@ -1,4 +1,4 @@
-import typescript from "rollup-plugin-typescript2";
+import typescript from "rollup-plugin-typescript";
 import resolve from "rollup-plugin-node-resolve";
 
 export default {
@@ -11,5 +11,8 @@ export default {
   preferBuiltins: true,
   exports: "named",
   external: ["events", "react"],
-  plugins: [resolve({ main: true, jsnext: true }), typescript()]
+  plugins: [
+    resolve({ main: true, jsnext: true }),
+    typescript()
+  ]
 };

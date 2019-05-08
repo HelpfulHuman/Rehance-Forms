@@ -26,7 +26,7 @@ export type CollectionScopeProps = {
  * The collection scope allows for an array of objects to be mapped to a
  * subform of fields.
  */
-export class _CollectionScope extends React.Component<WithFormScopeProps<CollectionScopeProps>> {
+class _CollectionScope extends React.Component<WithFormScopeProps<CollectionScopeProps>> {
 
   static displayName: string = "CollectionScope";
 

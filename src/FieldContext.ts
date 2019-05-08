@@ -1,4 +1,5 @@
 import { IScopeChild } from "./types";
+import { equal } from "./utils";
 
 export class FieldContext implements IScopeChild {
 
@@ -29,17 +30,7 @@ export class FieldContext implements IScopeChild {
    * Returns true if the value for the field has changed.
    */
   public get changed(): boolean {
-    let ot = typeof this._initialValue;
-
-    if (ot !== typeof this.value) {
-      return true;
-    }
-
-    if (ot === "object") {
-      return JSON.stringify(this._initialValue) !== JSON.stringify(this.value);
-    }
-
-    return this._initialValue !== this.value;
+    return !equal(this._initialValue, this.value);
   }
 
   /**
@@ -54,6 +45,13 @@ export class FieldContext implements IScopeChild {
    */
   public clear() {
     this.value = null;
+  }
+
+  /**
+   * Replaces the `initialValue` of the field with the current `value`.
+   */
+  public commit() {
+    this._initialValue = this.value;
   }
 
 }

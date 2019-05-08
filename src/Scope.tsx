@@ -7,7 +7,7 @@ export type ScopeProps = {
   children?: React.ReactNode;
 };
 
-export class _Scope extends React.PureComponent<WithFormScopeProps<ScopeProps>> {
+class _Scope extends React.PureComponent<WithFormScopeProps<ScopeProps>> {
 
   static displayName = "Scope";
 

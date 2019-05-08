@@ -31,6 +31,7 @@ export interface IScopeChild {
   changed: boolean;
   reset(): void;
   clear(): void;
+  commit(): void;
 }
 
 export interface IScopeContext extends IScopeChild {

@@ -14,7 +14,7 @@ export type AddCollectionItemProps = {
   onClick?(ev: React.MouseEvent<HTMLButtonElement>, scope: ScopeContext): void;
 };
 
-export class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCollectionItemProps>> {
+class _AddCollectionItem extends React.Component<WithFormScopeProps<AddCollectionItemProps>> {
 
   static displayName: string = "AddCollectionItem";
 

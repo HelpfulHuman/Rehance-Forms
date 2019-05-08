@@ -96,8 +96,10 @@ export abstract class BaseContext implements IScopeChild {
    * Triggers an update that will be broadcasted to all scopes within the hierarchy that
    * this scope belongs to.
    */
-  public broadcast(signal: FormEventSignal, field?: string): void {
+  public broadcast(signal: FormEventSignal, field?: string) {
     this._events.trigger({ scope: this, signal, field });
+
+    return this;
   }
 
   /**
@@ -105,6 +107,8 @@ export abstract class BaseContext implements IScopeChild {
    */
   public submit() {
     this.broadcast(FormEventSignal.SubmitForm);
+
+    return this;
   }
 
   abstract readonly touched: boolean;
@@ -113,6 +117,7 @@ export abstract class BaseContext implements IScopeChild {
   abstract readonly changed: boolean;
   abstract reset(): void;
   abstract clear(): void;
+  abstract commit(): void;
 
 }
 
@@ -149,6 +154,8 @@ export class ScopeContext extends BaseContext implements IScopeChild {
    */
   public setChild(name: string, child: ScopeChild) {
     this.children[name] = child;
+
+    return this;
   }
 
   /**
@@ -156,6 +163,8 @@ export class ScopeContext extends BaseContext implements IScopeChild {
    */
   public clearChild(name: string) {
     delete this.children[name];
+
+    return this;
   }
 
   /**
@@ -288,6 +297,8 @@ export class ScopeContext extends BaseContext implements IScopeChild {
     for (let key in this.children) {
       this.children[key].reset();
     }
+
+    return this;
   }
 
   /**
@@ -297,6 +308,8 @@ export class ScopeContext extends BaseContext implements IScopeChild {
     for (let key in this.children) {
       this.children[key].clear();
     }
+
+    return this;
   }
 
   /**
@@ -306,8 +319,28 @@ export class ScopeContext extends BaseContext implements IScopeChild {
     return (this.children[field] !== undefined ? this.children[field].value : fallback);
   }
 
-}
+  /**
+   * Adopts the current values for each field as the new initial value, setting the
+   * changed state for the scope to `false`.  If you want to commit changes for a full
+   * form from a sub scope, use `scope.root.commit()`.  Once you've committed the changes
+   * you'll want to run the `.update()` method to broadcast the update.
+   */
+  public commit() {
+    for (let key in this.children) {
+      this.children[key].commit();
+    }
 
+    return this;
+  }
+
+  /**
+   * Convenience method that broadcasts the scope update event.
+   */
+  public update() {
+    return this.broadcast(FormEventSignal.ScopeUpdate);
+  }
+
+}
 
 function getChildScopeValue(scope: ScopeContext) {
   return scope.value;
@@ -337,6 +370,8 @@ export class ListScopeContext extends BaseContext {
    */
   public addChildScope(values: FieldMap = {}) {
     this.children.push(new ScopeContext(values, this));
+
+    return this;
   }
 
   /**
@@ -345,6 +380,8 @@ export class ListScopeContext extends BaseContext {
   public removeChildScope(index: number) {
     if (index < 0 || index >= this.children.length) { return; }
     this.children.splice(index, 1);
+
+    return this;
   }
 
   /**
@@ -422,6 +459,8 @@ export class ListScopeContext extends BaseContext {
     for (let child of this.children) {
       child.reset();
     }
+
+    return this;
   }
 
   /**
@@ -431,6 +470,29 @@ export class ListScopeContext extends BaseContext {
     for (let child of this.children) {
       child.clear();
     }
+
+    return this;
+  }
+
+  /**
+   * Adopts the current values for each field as the new initial value, setting the
+   * changed state for the scope to `false`.  If you want to commit changes for a full
+   * form from a sub scope, use `scope.root.commit()`.  Once you've committed the changes
+   * you'll want to run the `.update()` method to broadcast the update.
+   */
+  public commit() {
+    for (let child of this.children) {
+      child.commit();
+    }
+
+    return this;
+  }
+
+  /**
+   * Convenience method that broadcasts the scope update event.
+   */
+  public update() {
+    return this.broadcast(FormEventSignal.ScopeUpdate);
   }
 
 }

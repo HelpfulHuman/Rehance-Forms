@@ -23,7 +23,7 @@ export type RenderRadioProps = {
   deselect(): void;
 };
 
-export class _Radio extends React.Component<WithFieldProps<RadioProps>> {
+class _Radio extends React.Component<WithFieldProps<RadioProps>> {
 
   static defaultProps: Partial<RadioProps> = {
     className: "Radio",

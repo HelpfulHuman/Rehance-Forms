@@ -23,7 +23,7 @@ export type RenderMultiSelectProps = {
   toggle(): void;
 };
 
-export class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProps>> {
+class _MultiSelect extends React.Component<WithFieldProps<MultiSelectProps>> {
 
   static defaultProps: Partial<MultiSelectProps> = {
     className: "MultiSelect",

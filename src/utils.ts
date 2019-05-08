@@ -41,3 +41,60 @@ export function memoize<T extends (...args: any[]) => any>(func: T) {
     return cache[key];
   };
 }
+
+const isArray = Array.isArray;
+const keyList = Object.keys;
+const hasProp = Object.prototype.hasOwnProperty;
+
+export function equal(a: unknown, b: unknown): boolean {
+  if (a === b) { return true; }
+
+  if (a && b && typeof a == "object" && typeof b == "object") {
+    let arrA = isArray(a)
+      , arrB = isArray(b)
+      , i
+      , length
+      , key;
+
+    if (arrA && arrB) {
+      length = (a as unknown[]).length;
+      if (length != (b as unknown[]).length) { return false; }
+      for (i = length; i-- !== 0;) {
+        if (!equal((a as unknown[])[i], (b as unknown[])[i])) { return false; }
+      }
+      return true;
+    }
+
+    if (arrA != arrB) { return false; }
+
+    let dateA = a instanceof Date
+      , dateB = b instanceof Date;
+    if (dateA != dateB) { return false; }
+    if (dateA && dateB) { return (a as Date).getTime() == (b as Date).getTime(); }
+
+    let regexpA = a instanceof RegExp
+      , regexpB = b instanceof RegExp;
+    if (regexpA != regexpB) { return false; }
+    if (regexpA && regexpB) { return a.toString() == b.toString(); }
+
+    let keys = keyList(a as object);
+    length = keys.length;
+
+    if (length !== keyList(b as object).length) {
+      return false;
+    }
+
+    for (i = length; i-- !== 0;) {
+      if (!hasProp.call(b, keys[i])) { return false; }
+    }
+
+    for (i = length; i-- !== 0;) {
+      key = keys[i];
+      if (!equal((a as object)[key], (b as object)[key])) { return false; }
+    }
+
+    return true;
+  }
+
+  return a !== a && b !== b;
+}
