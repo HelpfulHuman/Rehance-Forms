@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "jsx": "react",
-    "sourceMap": true,
+    "sourceMap": false,
     "allowJs": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
@@ -11,8 +11,9 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
+    "outDir": "./dist",
     "declaration": true,
-    "declarationDir": "dist",
+    "declarationDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "lib": [
       "es2015",
@@ -26,9 +27,6 @@
     "src/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "dist"
+    "node_modules"
   ]
 }

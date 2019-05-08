@@ -75,7 +75,7 @@ export function equal(a: unknown, b: unknown): boolean {
     let regexpA = a instanceof RegExp
       , regexpB = b instanceof RegExp;
     if (regexpA != regexpB) { return false; }
-    if (regexpA && regexpB) { return a.toString() == b.toString(); }
+    if (regexpA && regexpB) { return (a as RegExp).toString() == (b as RegExp).toString(); }
 
     let keys = keyList(a as object);
     length = keys.length;
